@@ -6,6 +6,7 @@ import time
 # Global constants
 TERMINAL_WIDTH = os.get_terminal_size()[0]
 
+
 # Class construction
 class Player:
     def __init__(self, name):

@@ -77,16 +77,12 @@ def program():
         random.shuffle(gunBullets)
         turnFlag = True
         while len(gunBullets) > 0:
-                #!stupid hardcoded, will modulize VVV
-            print(f"{player1.name}:{player1.hp} | {player2.name}:{player2.hp}\n")
+            print(f"{player1Name}:{player1Hp} | {player2Name}:{player2Hp}\n")
+
             if turnFlag:
-                print(f"< {player1.name}'s turn")
-                print('='*TERMINAL_WIDTH)
-                print(f"Items = {player1.items}")
+                print(f"< {player1Name}'s turn\n{'='*TERMINAL_WIDTH}\nItems = {player1Items}")
             else:
-                print(f"> {player2.name}'s turn")
-                print('='*TERMINAL_WIDTH)
-                print(f"Items = {player2.items}")
+                print(f"> {player2Name}'s turn\n{'='*TERMINAL_WIDTH}\nItems = {player2Items}")
             
             print("[G]Use gun [1~8]Use item [X]Exit")
             actionChar = input(">>> ")
@@ -94,15 +90,12 @@ def program():
 
             if actionChar == "G":
                 while True:
-                    frontPlayer = player2.name if turnFlag else player1.name
-                    frontHP = player2.hp if turnFlag else player1.hp
-
-                    selfPlayer = player1.name if turnFlag else player2.name
-                    selfHP = player1.hp if turnFlag else player2.hp
+                    frontPlayer = player2 if turnFlag else player1
+                    selfPlayer = player1 if turnFlag else player2
 
                     print("You are holding a gun ( -_•)▄︻テ══━一")
                     print('='*TERMINAL_WIDTH)
-                    actionChar = input(f"[X]Shoot front: {frontPlayer} [O]Shoot self: {selfPlayer}\n>>> ")
+                    actionChar = input(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n>>> ")
                     clearCLI()
 
                     if actionChar == "X" or actionChar == "O":
@@ -111,10 +104,9 @@ def program():
                         print("[X] Invalid input\n")
 
                 if actionChar == "X":
-                    targetHP = frontHP
+                    frontPlayer.hp = shootGun(frontPlayer.hp, gunBullets)
                 elif actionChar == "O":
-                    targetHP = selfHP
-                player1.hp = shootGun(targetHP, gunBullets)
+                    selfPlayer.hp = shootGun(selfPlayer.hp, gunBullets)
                 clearCLI()
 
                 turnFlag = not(turnFlag)
@@ -132,9 +124,9 @@ def program():
                 #!stupid hardcoded, will modulize ^^^
     
     if player1.hp < 1:
-        print(f"☠️ {player1.name} is DEAD")
+        print(f"☠️ {player1Name} is DEAD")
     if player2.hp < 1:
-        print(f"☠️ {player2.name} is DEAD")
+        print(f"☠️ {player2Name} is DEAD")
 
 # MAIN
 program()

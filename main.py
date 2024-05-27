@@ -2,6 +2,7 @@
 #!2 User can type while time.sleep
 #!3 may need seperate Main Menu from Program()
 #!4 clear command not clean becoz \r
+#!5 starting bullets does not force at least one 0 and 1
 
 # Library imports
 import os
@@ -22,6 +23,7 @@ gunBullets = []
 
 # Message Strings
 askName = "Enter player name: "
+inputArrow = ">>> "
 insertBullets = "⁍⁍⁍ ▄︻テ══━一 Inserting bullets... "
 gunHolding = "You are holding a gun ( -_•)▄︻テ══━一"
 gunFired = "You fired a gun ( -_•)▄︻テ══━一💥"
@@ -43,7 +45,6 @@ def useItem(index = 999, playerItem = []):
 
 #> For gun shooting logic
 def shootGun(targetHP, bullets = []):
-    result = ""
     print(gunFired)
     bulletFired = bullets.pop(0)
     print(bulletFly)
@@ -89,22 +90,19 @@ def program():
         while len(gunBullets) > 0:
             print(f"{player1Name}:{player1Hp} | {player2Name}:{player2Hp}\n")
 
-            if turnFlag:
-                print(f"< {player1Name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = {player1Items}")
-            else:
-                print(f"> {player2Name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = {player2Items}")
+            frontPlayer = player2 if turnFlag else player1
+            selfPlayer = player1 if turnFlag else player2
+            print("< " if turnFlag else "> ", end="")
+            print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = {selfPlayer.items}")
             
             print("[G]Use gun [1~8]Use item [X]Exit")
-            actionChar = input(">>> ")
+            actionChar = input(inputArrow)
             clearCLI()
 
             if actionChar == "G":
                 while True:
-                    frontPlayer = player2 if turnFlag else player1
-                    selfPlayer = player1 if turnFlag else player2
-
                     print(gunHolding)
-                    print('='*TERMINAL_WIDTH)
+                    print(CLI_HORIZONTAL_LINE)
                     actionChar = input(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n>>> ")
                     clearCLI()
 

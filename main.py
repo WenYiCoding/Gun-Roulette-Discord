@@ -2,6 +2,7 @@
 #!2 User can type while time.sleep
 #!3 may need seperate Main Menu from Program()
 #!4 clear command not clean becoz \r
+#!5 starting bullets does not force at least one 0 and 1
 
 # Library imports
 import os
@@ -17,10 +18,22 @@ class Player:
 
 # Global variables
 TERMINAL_WIDTH = os.get_terminal_size()[0]
+CLI_HORIZONTAL_LINE = '='*TERMINAL_WIDTH
 gunBullets = []
 
 # Message Strings
 askName = "Enter player name: "
+inputArrow = ">>> "
+insertBullets = "⁍⁍⁍ ▄︻テ══━一 Inserting bullets... "
+gunHolding = "You are holding a gun ( -_•)▄︻テ══━一"
+gunFired = "You fired a gun ( -_•)▄︻テ══━一💥"
+bulletFly = "= ⁍ "
+hit = " 🩸 HIT"
+nothing = " ⚬ Nothing happended"
+enterPly1Name = "Enter player 1 name: "
+enterPly2Name = "Enter player 2 name: "
+playAgain = "Game ended! Play again? [Y/N]"
+invalidInput = "[X] Invalid input\n"
 
 # Functions
 def clearCLI():
@@ -32,25 +45,23 @@ def useItem(index = 999, playerItem = []):
 
 #> For gun shooting logic
 def shootGun(targetHP, bullets = []):
-    result = ""
-    print("You fired a gun ( -_•)▄︻テ══━一💥")
+    print(gunFired)
     bulletFired = bullets.pop(0)
-    print("= ⁍ ")
+    print(bulletFly)
     time.sleep(2) #!3
     if bulletFired == 1:
         targetHP -= 1
-        result = f" 🩸 HIT"
+        print(hit)
     elif bulletFired == 0:
-        result = " ⚬ Nothing happended"
-    print(result)
+        print(nothing)
     time.sleep(2) #!3
     return targetHP
 
 #> Whole program logic
 def program():
     clearCLI()
-    player1 = Player(input("Enter player 1 name: "))
-    player2 = Player(input("Enter player 2 name: "))
+    player1 = Player(input(enterPly1Name))
+    player2 = Player(input(enterPly2Name))
 
     player1Name = player1.name
     player1Hp = player1.hp
@@ -65,11 +76,11 @@ def program():
             gunBullets.append(random.randint(0,1))
         random.shuffle(gunBullets)
 
-        print("Bullets:")
-        print(gunBullets)
+        print(f"Bullets:\n{gunBullets}")
 
         for i in range(5,-1,-1):
-            print(f"⁍⁍⁍ ▄︻テ══━一 Inserting bullets ({i})...", end="")
+            print(insertBullets, end="")
+            print(f"({i})", end="")
             print("\r", end="")
             time.sleep(1) #!3
         clearCLI() #!clear command not clean becoz \r
@@ -79,29 +90,26 @@ def program():
         while len(gunBullets) > 0:
             print(f"{player1Name}:{player1Hp} | {player2Name}:{player2Hp}\n")
 
-            if turnFlag:
-                print(f"< {player1Name}'s turn\n{'='*TERMINAL_WIDTH}\nItems = {player1Items}")
-            else:
-                print(f"> {player2Name}'s turn\n{'='*TERMINAL_WIDTH}\nItems = {player2Items}")
+            frontPlayer = player2 if turnFlag else player1
+            selfPlayer = player1 if turnFlag else player2
+            print("< " if turnFlag else "> ", end="")
+            print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = {selfPlayer.items}")
             
             print("[G]Use gun [1~8]Use item [X]Exit")
-            actionChar = input(">>> ")
+            actionChar = input(inputArrow)
             clearCLI()
 
             if actionChar == "G":
                 while True:
-                    frontPlayer = player2 if turnFlag else player1
-                    selfPlayer = player1 if turnFlag else player2
-
-                    print("You are holding a gun ( -_•)▄︻テ══━一")
-                    print('='*TERMINAL_WIDTH)
+                    print(gunHolding)
+                    print(CLI_HORIZONTAL_LINE)
                     actionChar = input(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n>>> ")
                     clearCLI()
 
                     if actionChar == "X" or actionChar == "O":
                         break
                     else:
-                        print("[X] Invalid input\n")
+                        print(invalidInput)
 
                 if actionChar == "X":
                     frontPlayer.hp = shootGun(frontPlayer.hp, gunBullets)
@@ -118,9 +126,9 @@ def program():
                 if (itemIdx > 0) and (itemIdx < 9):
                     useItem(itemIdx)
                 else:
-                    print("[X] Invalid input\n")
+                    print(invalidInput)
             else:
-                print("[X] Invalid input\n")
+                print(invalidInput)
                 #!stupid hardcoded, will modulize ^^^
     
     if player1.hp < 1:
@@ -130,5 +138,5 @@ def program():
 
 # MAIN
 program()
-while (input("Game ended! Play again? [Y/N]")):
+while (input(playAgain)):
     program()

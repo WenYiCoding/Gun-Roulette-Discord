@@ -61,7 +61,12 @@ def gunReload():
     bullets = []
 
     for i in range(random.randint(2,8)):
-        bullets.append(random.randint(0,1))
+        if i == 0:
+            bullets.append(1)
+        elif i == 1:
+            bullets.append(0)
+        else:
+            bullets.append(random.randint(0,1))
     random.shuffle(bullets)
 
     print(f"Bullets:\n{bullets}")
@@ -69,19 +74,21 @@ def gunReload():
     for i in range(5,-1,-1):
         print(f"{insertBullets}({i})\r", end="")
         time.sleep(1) #!3
+
+    random.shuffle(bullets)
     clearCLI() #!4
 
     return bullets
-
-#> Turn logic
-def turn():
-    pass
 
 #> Reset player health
 def resetHealth(players):
     for player in players:
         player.hp = 10
     return players
+
+#> Turn logic
+def turn():
+    pass
 
 #> Round logic
 def round(players):
@@ -90,16 +97,11 @@ def round(players):
         for player in players:
             if player.hp <= 0:
                 print(f"{player.name}{isDead}")
+                time.sleep(2) #!3
                 return
         
         turnFlag = True
-        
         bullets = gunReload()
-
-        players[1].hp = 0
-        print("HIT")
-
-
 
 #> Item usage logic
 def useItem(index = 999, playerItem = []):

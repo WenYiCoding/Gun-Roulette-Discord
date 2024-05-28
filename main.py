@@ -123,34 +123,34 @@ def useItem(index = 999, playerItem = []):
 
 #> Turn logic
 def turn(turnFlag, players, bullets):
-    print(f"{players[0].name}:{players[0].hp} | {players[1].name}:{players[1].hp}\n")
+    while True:
+        print(f"{players[0].name}:{players[0].hp} | {players[1].name}:{players[1].hp}\n")
 
-    selfPlayer = players[0] if turnFlag else players[1]
-    frontPlayer = players[1] if turnFlag else players[0]
+        selfPlayer = players[0] if turnFlag else players[1]
+        frontPlayer = players[1] if turnFlag else players[0]
 
-    print("< " if turnFlag else "> ", end="")
-    print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = {selfPlayer.items}")
-    
-    actionChar = input(f"{turnOptions}\n{inputArrow}")
-    clearCLI()
+        print("< " if turnFlag else "> ", end="")
+        print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = {selfPlayer.items}")
+        
+        actionChar = input(f"{turnOptions}\n{inputArrow}")
+        clearCLI()
 
-    if actionChar == "G":
-        holdGun(selfPlayer, frontPlayer, bullets)
+        if actionChar == "G":
+            holdGun(selfPlayer, frontPlayer, bullets)
+            return players
 
-    elif actionChar == "X":
-        exit(0)
+        elif actionChar == "X":
+            exit(0)
 
-    elif actionChar.isdigit():
-        itemIdx = int(actionChar)
-        if (itemIdx > 0) and (itemIdx < 9):
-            useItem(itemIdx)
+        elif actionChar.isdigit():
+            itemIdx = int(actionChar)
+            if (itemIdx > 0) and (itemIdx < 9):
+                useItem(itemIdx)
+            else:
+                print(invalidInput)
+
         else:
             print(invalidInput)
-
-    else:
-        print(invalidInput)
-
-    return players
 
 #> Round logic
 def round(players):

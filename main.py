@@ -25,6 +25,7 @@ CLI_HORIZONTAL_LINE = '='*TERMINAL_WIDTH
 askName = "Enter player's name\n[!] Enter empty name to become bot\n"
 inputArrow = ">>> "
 insertBullets = "⁍⁍⁍ ▄︻テ══━一 Inserting bullets... "
+turnOptions = "[G]Use gun [1~8]Use item [X]Exit"
 gunHolding = "You are holding a gun ( -_•)▄︻テ══━一"
 gunFired = "You fired a gun ( -_•)▄︻テ══━一💥"
 bulletFly = "= ⁍ "
@@ -86,15 +87,65 @@ def resetHealth(players):
         player.hp = 10
     return players
 
+#> Hold gun
+def holdGun(selfPlayer, frontPlayer, bullets):
+    actionKey = ""
+
+    print(gunHolding)
+    while actionKey != "X" or actionKey != "O":
+        print(invalidInput if actionKey != "" else "")
+        actionKey = input(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}")
+    if actionKey == "X":
+        frontPlayer.hp = shootGun(frontPlayer.hp, bullets)
+    elif actionKey == "O":
+        selfPlayer.hp = shootGun(selfPlayer.hp, bullets)
+
+#> Shoot gun
+def shootGun(targetHP, bullets):
+    print(gunFired)
+    bulletFired = bullets.pop(0)
+    print(bulletFly)
+    time.sleep(2) #!3
+    if bulletFired == 1:
+        targetHP -= 1
+        print(hit)
+    elif bulletFired == 0:
+        print(nothing)
+    time.sleep(2) #!3
+    return targetHP
+
+#> Item usage logic
+def useItem(index = 999, playerItem = []):
+    pass
+
 #> Turn logic
 def turn(turnFlag, players, bullets):
     selfPlayer = players[0] if turnFlag else players[1]
     frontPlayer = players[1] if turnFlag else players[0]
 
     print(f"{selfPlayer.name}:{selfPlayer.hp} | {frontPlayer.name}:{frontPlayer.hp}\n")
-
-    time.sleep(20000)
+    print("< " if turnFlag else "> ", end="")
+    print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = {selfPlayer.items}")
     
+    actionChar = input(f"{turnOptions}\n{inputArrow}")
+    clearCLI()
+
+    if actionChar == "G":
+        holdGun(selfPlayer, frontPlayer, bullets)
+
+    elif actionChar == "X":
+        exit(0)
+
+    elif actionChar.isdigit():
+        itemIdx = int(actionChar)
+        if (itemIdx > 0) and (itemIdx < 9):
+            useItem(itemIdx)
+        else:
+            print(invalidInput)
+
+    else:
+        print(invalidInput)
+
     return players
 
 #> Round logic
@@ -115,24 +166,6 @@ def round(players):
         players = turn(turnFlag, players, bullets)
         turnFlag = not(turnFlag)
 
-#> Item usage logic
-def useItem(index = 999, playerItem = []):
-    pass
-
-#> Shoot gun
-def shootGun(targetHP, bullets = []):
-    print(gunFired)
-    bulletFired = bullets.pop(0)
-    print(bulletFly)
-    time.sleep(2) #!3
-    if bulletFired == 1:
-        targetHP -= 1
-        print(hit)
-    elif bulletFired == 0:
-        print(nothing)
-    time.sleep(2) #!3
-    return targetHP
-
 #> Whole program logic
 def program():
     clearCLI()
@@ -142,56 +175,6 @@ def program():
         print(f"Round {1+i}")
         round(players)
 
-""" 
-    while len(gunBullets) > 0:
-        print(f"{player1Name}:{player1Hp} | {player2Name}:{player2Hp}\n")
-
-        frontPlayer = player2 if turnFlag else player1
-        selfPlayer = player1 if turnFlag else player2
-        print("< " if turnFlag else "> ", end="")
-        print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = {selfPlayer.items}")
-        
-        print("[G]Use gun [1~8]Use item [X]Exit")
-        actionChar = input(inputArrow)
-        clearCLI()
-
-        if actionChar == "G":
-            while True:
-                print(gunHolding)
-                print(CLI_HORIZONTAL_LINE)
-                actionChar = input(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
-                clearCLI()
-
-                if actionChar != "X" and actionChar != "O":
-                    print(invalidInput)
-                else:
-                    break
-
-            if actionChar == "X":
-                frontPlayer.hp = shootGun(frontPlayer.hp, gunBullets)
-            elif actionChar == "O":
-                selfPlayer.hp = shootGun(selfPlayer.hp, gunBullets)
-            clearCLI()
-
-            turnFlag = not(turnFlag)
-
-        elif actionChar == "X":
-            exit(0)
-        elif actionChar.isdigit():
-            itemIdx = int(actionChar)
-            if (itemIdx > 0) and (itemIdx < 9):
-                useItem(itemIdx)
-            else:
-                print(invalidInput)
-        else:
-            print(invalidInput)
-            #!stupid hardcoded, will modulize ^^^
-    
-    if player1.hp < 1:
-        print(f"☠️ {player1Name} is DEAD")
-    if player2.hp < 1:
-        print(f"☠️ {player2Name} is DEAD")
- """
 # MAIN
 program()
 while (input(playAgain)):

@@ -98,12 +98,17 @@ def holdGun(selfPlayer, frontPlayer, bullets):
         actionKey = input(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
         clearCLI()
     if actionKey == "X":
-        frontPlayer.hp = shootGun(frontPlayer.hp, bullets)
+        result = shootGun(frontPlayer.hp, bullets)
+        frontPlayer.hp = result[0]
+        return result[1]
     elif actionKey == "O":
-        selfPlayer.hp = shootGun(selfPlayer.hp, bullets)
+        result = shootGun(selfPlayer.hp, bullets)
+        selfPlayer.hp = result[0]
+        return not(result[1])
 
 #> Shoot gun
 def shootGun(targetHP, bullets):
+    hitFlag = False
     print(gunFired)
     bulletFired = bullets.pop(0)
     print(bulletFly)
@@ -111,11 +116,12 @@ def shootGun(targetHP, bullets):
     if bulletFired == 1:
         targetHP -= 1
         print(hit)
+        hitFlag = True
     elif bulletFired == 0:
         print(nothing)
     time.sleep(2) #!3
     clearCLI()
-    return targetHP
+    return [targetHP, hitFlag]
 
 #> Item usage logic
 def useItem(index = 999, playerItem = []):
@@ -136,8 +142,9 @@ def turn(turnFlag, players, bullets):
         clearCLI()
 
         if actionChar == "G":
-            holdGun(selfPlayer, frontPlayer, bullets)
-            return players
+            extraTurn = holdGun(selfPlayer, frontPlayer, bullets)
+            if not(extraTurn):
+                return players
 
         elif actionChar == "X":
             exit(0)

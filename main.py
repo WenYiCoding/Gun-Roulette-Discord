@@ -152,6 +152,9 @@ def turn(turnFlag, players, bullets):
 #> Round logic
 def round(players):
     players = resetHealth(players)
+    turnFlag = True
+    bullets = []
+    
     while True:
         for player in players:
             if player.hp <= 0:
@@ -159,8 +162,6 @@ def round(players):
                 time.sleep(2) #!3
                 return
         
-        turnFlag = True
-        bullets = []
         if len(bullets) <= 0:
             bullets = gunReload()
         

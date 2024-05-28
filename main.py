@@ -12,6 +12,7 @@ import time
 # Class construction
 class Player:
     def __init__(self, name):
+        self.playerType = "BOT" if (name == "") else "User"
         self.name = name
         self.hp = 10
         self.items = []
@@ -19,10 +20,9 @@ class Player:
 # Global variables
 TERMINAL_WIDTH = os.get_terminal_size()[0]
 CLI_HORIZONTAL_LINE = '='*TERMINAL_WIDTH
-gunBullets = []
 
 # Message Strings
-askName = "Enter player name: "
+askName = "Enter player's name\n[!] Enter empty name to become bot\n"
 inputArrow = ">>> "
 insertBullets = "⁍⁍⁍ ▄︻テ══━一 Inserting bullets... "
 gunHolding = "You are holding a gun ( -_•)▄︻テ══━一"
@@ -30,20 +30,81 @@ gunFired = "You fired a gun ( -_•)▄︻テ══━一💥"
 bulletFly = "= ⁍ "
 hit = " 🩸 HIT"
 nothing = " ⚬ Nothing happended"
-enterPly1Name = "Enter player 1 name: "
-enterPly2Name = "Enter player 2 name: "
+isDead = " is DEAD ☠️"
 playAgain = "Game ended! Play again? [Y/N]"
 invalidInput = "[X] Invalid input\n"
 
-# Functions
+#> Clear terminal output
 def clearCLI():
     os.system('cls||clear')
 
-#> For item usage logic
+#> Initialize the player
+def initPlayer():
+    players = []
+    for i in range(1,3):
+        players.append(Player(input(f"[Player {i}] {askName}{inputArrow}")))
+        clearCLI()
+    return players
+
+#> Set rounds to play
+def setRounds():
+    number = ""
+    while not(number.isdigit()):
+        print(number)
+        number = input(f"How many rounds do you want to play?\n{inputArrow}")
+        number = number if number.isdigit() else invalidInput
+    return int(number)
+
+#> Reload gun
+def gunReload():
+    bullets = []
+
+    for i in range(random.randint(2,8)):
+        bullets.append(random.randint(0,1))
+    random.shuffle(bullets)
+
+    print(f"Bullets:\n{bullets}")
+
+    for i in range(5,-1,-1):
+        print(f"{insertBullets}({i})\r", end="")
+        time.sleep(1) #!3
+    clearCLI() #!4
+
+    return bullets
+
+#> Turn logic
+def turn():
+    pass
+
+#> Reset player health
+def resetHealth(players):
+    for player in players:
+        player.hp = 10
+    return players
+
+#> Round logic
+def round(players):
+    players = resetHealth(players)
+    while True:
+        for player in players:
+            if player.hp <= 0:
+                print(f"{player.name}{isDead}")
+                return
+        
+        turnFlag = True
+        
+        bullets = gunReload()
+
+        players[0].hp = 0
+        print("HIT")
+
+
+
+#> Item usage logic
 def useItem(index = 999, playerItem = []):
     pass
 
-#> For gun shooting logic
+#> Shoot gun
 def shootGun(targetHP, bullets = []):
     print(gunFired)
     bulletFired = bullets.pop(0)
@@ -60,30 +121,22 @@ def shootGun(targetHP, bullets = []):
 #> Whole program logic
 def program():
     clearCLI()
-    player1 = Player(input(enterPly1Name))
-    player2 = Player(input(enterPly2Name))
+    players = initPlayer()
 
-    player1Name = player1.name
-    player1Hp = player1.hp
-    player1Items = player1.items
+    for i in range(0,setRounds()):
+        round(players)
 
-    player2Name = player2.name
-    player2Hp = player2.hp
-    player2Items = player2.items
+###############################################
+    os._exit(0)
+    turnFlag = True
+
+    turn()
+
+    for player in players:
+        player.name
 
     while (player1Hp > 0) or (player2Hp > 0):
-        for i in range(random.randint(2,8)):
-            gunBullets.append(random.randint(0,1))
-        random.shuffle(gunBullets)
-
-        print(f"Bullets:\n{gunBullets}")
-
-        for i in range(5,-1,-1):
-            print(insertBullets, end="")
-            print(f"({i})", end="")
-            print("\r", end="")
-            time.sleep(1) #!3
-        clearCLI() #!clear command not clean becoz \r
+        
 
         random.shuffle(gunBullets)
         turnFlag = True
@@ -103,13 +156,13 @@ def program():
                 while True:
                     print(gunHolding)
                     print(CLI_HORIZONTAL_LINE)
-                    actionChar = input(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n>>> ")
+                    actionChar = input(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
                     clearCLI()
 
-                    if actionChar == "X" or actionChar == "O":
-                        break
-                    else:
+                    if actionChar != "X" and actionChar != "O":
                         print(invalidInput)
+                    else:
+                        break
 
                 if actionChar == "X":
                     frontPlayer.hp = shootGun(frontPlayer.hp, gunBullets)

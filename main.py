@@ -16,6 +16,7 @@ class Player:
         self.name = name
         self.hp = 10
         self.items = []
+        self.roundHistory = []
 
 # Global variables
 TERMINAL_WIDTH = os.get_terminal_size()[0]
@@ -98,12 +99,17 @@ def holdGun(selfPlayer, frontPlayer, bullets):
         actionKey = input(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
         clearCLI()
     if actionKey == "X":
-        frontPlayer.hp = shootGun(frontPlayer.hp, bullets)
+        result = shootGun(frontPlayer.hp, bullets)
+        frontPlayer.hp = result[0]
+        return result[1]
     elif actionKey == "O":
-        selfPlayer.hp = shootGun(selfPlayer.hp, bullets)
+        result = shootGun(selfPlayer.hp, bullets)
+        selfPlayer.hp = result[0]
+        return not(result[1])
 
 #> Shoot gun
 def shootGun(targetHP, bullets):
+    hitFlag = False
     print(gunFired)
     bulletFired = bullets.pop(0)
     print(bulletFly)
@@ -111,11 +117,12 @@ def shootGun(targetHP, bullets):
     if bulletFired == 1:
         targetHP -= 1
         print(hit)
+        hitFlag = True
     elif bulletFired == 0:
         print(nothing)
     time.sleep(2) #!3
     clearCLI()
-    return targetHP
+    return [targetHP, hitFlag]
 
 #> Item usage logic
 def useItem(index = 999, playerItem = []):
@@ -123,33 +130,38 @@ def useItem(index = 999, playerItem = []):
 
 #> Turn logic
 def turn(turnFlag, players, bullets):
-    selfPlayer = players[0] if turnFlag else players[1]
-    frontPlayer = players[1] if turnFlag else players[0]
+    while True:
+        if len(bullets) <= 0:
+            bullets = gunReload()
+        
+        print(f"{players[0].name}:{players[0].hp} | {players[1].name}:{players[1].hp}\n")
 
-    print(f"{selfPlayer.name}:{selfPlayer.hp} | {frontPlayer.name}:{frontPlayer.hp}\n")
-    print("< " if turnFlag else "> ", end="")
-    print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = {selfPlayer.items}")
-    
-    actionChar = input(f"{turnOptions}\n{inputArrow}")
-    clearCLI()
+        selfPlayer = players[0] if turnFlag else players[1]
+        frontPlayer = players[1] if turnFlag else players[0]
 
-    if actionChar == "G":
-        holdGun(selfPlayer, frontPlayer, bullets)
+        print("< " if turnFlag else "> ", end="")
+        print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = {selfPlayer.items}")
+        
+        actionChar = input(f"{turnOptions}\n{inputArrow}")
+        clearCLI()
 
-    elif actionChar == "X":
-        exit(0)
+        if actionChar == "G":
+            extraTurn = holdGun(selfPlayer, frontPlayer, bullets)
+            if not(extraTurn):
+                return players
 
-    elif actionChar.isdigit():
-        itemIdx = int(actionChar)
-        if (itemIdx > 0) and (itemIdx < 9):
-            useItem(itemIdx)
+        elif actionChar == "X":
+            exit(0)
+
+        elif actionChar.isdigit():
+            itemIdx = int(actionChar)
+            if (itemIdx > 0) and (itemIdx < 9):
+                useItem(itemIdx)
+            else:
+                print(invalidInput)
+
         else:
             print(invalidInput)
-
-    else:
-        print(invalidInput)
-
-    return players
 
 #> Round logic
 def round(players):
@@ -158,14 +170,15 @@ def round(players):
     bullets = []
 
     while True:
-        for player in players:
+        for idx, player in enumerate(players):
             if player.hp <= 0:
                 print(f"{player.name}{isDead}")
                 time.sleep(2) #!3
-                return
-        
-        if len(bullets) <= 0:
-            bullets = gunReload()
+                player.roundHistory.append("⭕")
+
+                idx = idx + 1
+                players[idx].roundHistory.append("❌")
+                return 
         
         players = turn(turnFlag, players, bullets)
         turnFlag = not(turnFlag)
@@ -179,7 +192,10 @@ def program():
         print(f"Round {1+i}\n{CLI_HORIZONTAL_LINE}")
         round(players)
 
+        for player in players:
+            print(f"Wins\n{player.name}: {player.roundHistory}")
+
 # MAIN
 program()
-while (input(playAgain)):
+while (input(f"{playAgain}\n{inputArrow}")):
     program()

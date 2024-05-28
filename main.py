@@ -16,6 +16,7 @@ class Player:
         self.name = name
         self.hp = 10
         self.items = []
+        self.roundHistory = []
 
 # Global variables
 TERMINAL_WIDTH = os.get_terminal_size()[0]
@@ -169,11 +170,15 @@ def round(players):
     bullets = []
 
     while True:
-        for player in players:
+        for idx, player in enumerate(players):
             if player.hp <= 0:
                 print(f"{player.name}{isDead}")
                 time.sleep(2) #!3
-                return
+                player.roundHistory.append("⭕")
+
+                idx = idx + 1
+                players[idx].roundHistory.append("❌")
+                return 
         
         players = turn(turnFlag, players, bullets)
         turnFlag = not(turnFlag)
@@ -187,7 +192,10 @@ def program():
         print(f"Round {1+i}\n{CLI_HORIZONTAL_LINE}")
         round(players)
 
+        for player in players:
+            print(f"Wins\n{player.name}: {player.roundHistory}")
+
 # MAIN
 program()
-while (input(playAgain)):
+while (input(f"{playAgain}\n{inputArrow}")):
     program()

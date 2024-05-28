@@ -123,10 +123,11 @@ def useItem(index = 999, playerItem = []):
 
 #> Turn logic
 def turn(turnFlag, players, bullets):
+    print(f"{players[0].name}:{players[0].hp} | {players[1].name}:{players[1].hp}\n")
+
     selfPlayer = players[0] if turnFlag else players[1]
     frontPlayer = players[1] if turnFlag else players[0]
 
-    print(f"{selfPlayer.name}:{selfPlayer.hp} | {frontPlayer.name}:{frontPlayer.hp}\n")
     print("< " if turnFlag else "> ", end="")
     print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = {selfPlayer.items}")
     

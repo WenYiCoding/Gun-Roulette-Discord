@@ -23,6 +23,7 @@ CLI_HORIZONTAL_LINE = '='*TERMINAL_WIDTH
 
 # Message Strings
 askName = "Enter player's name\n[!] Enter empty name to become bot\n"
+askRounds = "How many rounds do you want to play?"
 inputArrow = ">>> "
 insertBullets = "⁍⁍⁍ ▄︻テ══━一 Inserting bullets... "
 turnOptions = "[G]Use gun [1~8]Use item [X]Exit"
@@ -52,7 +53,7 @@ def setRounds():
     number = ""
     while not(number.isdigit()):
         print(number, end="")
-        number = input(f"How many rounds do you want to play?\n{inputArrow}")
+        number = input(f"{askRounds}\n{inputArrow}")
         clearCLI()
         number = number if number.isdigit() else invalidInput
     return int(number)
@@ -175,7 +176,7 @@ def program():
     players = initPlayer()
 
     for i in range(0,setRounds()):
-        print(f"Round {1+i}")
+        print(f"Round {1+i}\n{CLI_HORIZONTAL_LINE}")
         round(players)
 
 # MAIN

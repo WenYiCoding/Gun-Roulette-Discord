@@ -87,8 +87,15 @@ def resetHealth(players):
     return players
 
 #> Turn logic
-def turn():
-    pass
+def turn(turnFlag, players, bullets):
+    selfPlayer = players[0] if turnFlag else players[1]
+    frontPlayer = players[1] if turnFlag else players[0]
+
+    print(f"{selfPlayer.name}:{selfPlayer.hp} | {frontPlayer.name}:{frontPlayer.hp}\n")
+
+    time.sleep(20000)
+    
+    return players
 
 #> Round logic
 def round(players):
@@ -101,7 +108,12 @@ def round(players):
                 return
         
         turnFlag = True
-        bullets = gunReload()
+        bullets = []
+        if len(bullets) <= 0:
+            bullets = gunReload()
+        
+        players = turn(turnFlag, players, bullets)
+        turnFlag = not(turnFlag)
 
 #> Item usage logic
 def useItem(index = 999, playerItem = []):
@@ -130,69 +142,56 @@ def program():
         print(f"Round {1+i}")
         round(players)
 
-###############################################
-    os._exit(0)
-    turnFlag = True
+""" 
+    while len(gunBullets) > 0:
+        print(f"{player1Name}:{player1Hp} | {player2Name}:{player2Hp}\n")
 
-    turn()
-
-    for player in players:
-        player.name
-
-    while (player1Hp > 0) or (player2Hp > 0):
+        frontPlayer = player2 if turnFlag else player1
+        selfPlayer = player1 if turnFlag else player2
+        print("< " if turnFlag else "> ", end="")
+        print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = {selfPlayer.items}")
         
+        print("[G]Use gun [1~8]Use item [X]Exit")
+        actionChar = input(inputArrow)
+        clearCLI()
 
-        random.shuffle(gunBullets)
-        turnFlag = True
-        while len(gunBullets) > 0:
-            print(f"{player1Name}:{player1Hp} | {player2Name}:{player2Hp}\n")
-
-            frontPlayer = player2 if turnFlag else player1
-            selfPlayer = player1 if turnFlag else player2
-            print("< " if turnFlag else "> ", end="")
-            print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = {selfPlayer.items}")
-            
-            print("[G]Use gun [1~8]Use item [X]Exit")
-            actionChar = input(inputArrow)
-            clearCLI()
-
-            if actionChar == "G":
-                while True:
-                    print(gunHolding)
-                    print(CLI_HORIZONTAL_LINE)
-                    actionChar = input(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
-                    clearCLI()
-
-                    if actionChar != "X" and actionChar != "O":
-                        print(invalidInput)
-                    else:
-                        break
-
-                if actionChar == "X":
-                    frontPlayer.hp = shootGun(frontPlayer.hp, gunBullets)
-                elif actionChar == "O":
-                    selfPlayer.hp = shootGun(selfPlayer.hp, gunBullets)
+        if actionChar == "G":
+            while True:
+                print(gunHolding)
+                print(CLI_HORIZONTAL_LINE)
+                actionChar = input(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
                 clearCLI()
 
-                turnFlag = not(turnFlag)
-
-            elif actionChar == "X":
-                exit(0)
-            elif actionChar.isdigit():
-                itemIdx = int(actionChar)
-                if (itemIdx > 0) and (itemIdx < 9):
-                    useItem(itemIdx)
-                else:
+                if actionChar != "X" and actionChar != "O":
                     print(invalidInput)
+                else:
+                    break
+
+            if actionChar == "X":
+                frontPlayer.hp = shootGun(frontPlayer.hp, gunBullets)
+            elif actionChar == "O":
+                selfPlayer.hp = shootGun(selfPlayer.hp, gunBullets)
+            clearCLI()
+
+            turnFlag = not(turnFlag)
+
+        elif actionChar == "X":
+            exit(0)
+        elif actionChar.isdigit():
+            itemIdx = int(actionChar)
+            if (itemIdx > 0) and (itemIdx < 9):
+                useItem(itemIdx)
             else:
                 print(invalidInput)
-                #!stupid hardcoded, will modulize ^^^
+        else:
+            print(invalidInput)
+            #!stupid hardcoded, will modulize ^^^
     
     if player1.hp < 1:
         print(f"☠️ {player1Name} is DEAD")
     if player2.hp < 1:
         print(f"☠️ {player2Name} is DEAD")
-
+ """
 # MAIN
 program()
 while (input(playAgain)):

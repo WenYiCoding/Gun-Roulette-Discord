@@ -96,7 +96,7 @@ def round(players):
         
         bullets = gunReload()
 
-        players[0].hp = 0
+        players[1].hp = 0
         print("HIT")
 
 
@@ -125,6 +125,7 @@ def program():
     players = initPlayer()
 
     for i in range(0,setRounds()):
+        print(f"Round {1+i}")
         round(players)
 
 ###############################################

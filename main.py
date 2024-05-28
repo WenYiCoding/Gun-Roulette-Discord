@@ -128,8 +128,12 @@ def useItem(index = 999, playerItem = []):
     pass
 
 #> Turn logic
-def turn(turnFlag, players, bullets):
+def turn(turnFlag, players):
+    bullets = []
     while True:
+        if len(bullets) <= 0:
+            bullets = gunReload()
+        
         print(f"{players[0].name}:{players[0].hp} | {players[1].name}:{players[1].hp}\n")
 
         selfPlayer = players[0] if turnFlag else players[1]
@@ -163,7 +167,6 @@ def turn(turnFlag, players, bullets):
 def round(players):
     players = resetHealth(players)
     turnFlag = True
-    bullets = []
 
     while True:
         for player in players:
@@ -172,10 +175,7 @@ def round(players):
                 time.sleep(2) #!3
                 return
         
-        if len(bullets) <= 0:
-            bullets = gunReload()
-        
-        players = turn(turnFlag, players, bullets)
+        players = turn(turnFlag, players)
         turnFlag = not(turnFlag)
 
 #> Whole program logic

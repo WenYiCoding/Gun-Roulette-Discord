@@ -50,8 +50,9 @@ def initPlayer():
 def setRounds():
     number = ""
     while not(number.isdigit()):
-        print(number)
+        print(number, end="")
         number = input(f"How many rounds do you want to play?\n{inputArrow}")
+        clearCLI()
         number = number if number.isdigit() else invalidInput
     return int(number)
 

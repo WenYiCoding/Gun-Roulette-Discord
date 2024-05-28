@@ -113,6 +113,7 @@ def shootGun(targetHP, bullets):
     elif bulletFired == 0:
         print(nothing)
     time.sleep(2) #!3
+    clearCLI()
     return targetHP
 
 #> Item usage logic
@@ -154,7 +155,7 @@ def round(players):
     players = resetHealth(players)
     turnFlag = True
     bullets = []
-    
+
     while True:
         for player in players:
             if player.hp <= 0:

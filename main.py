@@ -33,7 +33,7 @@ hit = " 🩸 HIT"
 nothing = " ⚬ Nothing happended"
 isDead = " is DEAD ☠️"
 playAgain = "Game ended! Play again? [Y/N]"
-invalidInput = "[X] Invalid input\n"
+invalidInput = "[!] Invalid input\n"
 
 #> Clear terminal output
 def clearCLI():
@@ -92,9 +92,10 @@ def holdGun(selfPlayer, frontPlayer, bullets):
     actionKey = ""
 
     print(gunHolding)
-    while actionKey != "X" or actionKey != "O":
+    while actionKey != "X" and actionKey != "O":
         print(invalidInput if actionKey != "" else "")
-        actionKey = input(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}")
+        actionKey = input(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
+        clearCLI()
     if actionKey == "X":
         frontPlayer.hp = shootGun(frontPlayer.hp, bullets)
     elif actionKey == "O":

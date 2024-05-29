@@ -161,7 +161,7 @@ def round(players):
 
         if actionChar == "G":
             extraTurn = holdGun(selfPlayer, frontPlayer, bullets)
-            not(turnFlag) if not(extraTurn) else turnFlag
+            turnFlag = turnFlag if extraTurn else not(turnFlag)
 
         elif actionChar == "X":
             exit(0)
@@ -183,7 +183,7 @@ def program():
 
     for i in range(0,setRounds()):
         print(f"Round {1+i}\n{CLI_HORIZONTAL_LINE}")
-        
+
         players = resetHealth(players)
         round(players)
 

@@ -18,6 +18,39 @@ class Player:
         self.items = []
         self.roundHistory = []
 
+class Magnifier:
+    def use(bullets):
+        pass
+class MobilePhone:
+    def use(bullets):
+        pass
+    
+class Inverter:
+    def use():
+        pass
+class Saw:
+    def use():
+        pass
+class Soda:
+    def use():
+        pass
+class BorrowGun:
+    def use():
+        pass
+
+class Handcuff:
+    def use():
+        pass
+class Cigarette:
+    def use():
+        pass
+class Pill:
+    def use():
+        pass
+class Adrenaline:
+    def use():
+        pass
+
 # Global variables
 TERMINAL_WIDTH = os.get_terminal_size()[0]
 CLI_HORIZONTAL_LINE = '='*TERMINAL_WIDTH

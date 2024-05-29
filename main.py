@@ -9,48 +9,6 @@ import os
 import random
 import time
 
-# Class construction
-class Player:
-    def __init__(self, name):
-        self.playerType = "BOT" if (name == "") else "User"
-        self.name = name
-        self.hp = 10
-        self.items = []
-        self.roundHistory = []
-
-class Magnifier:
-    def use(bullets):
-        pass
-class MobilePhone:
-    def use(bullets):
-        pass
-    
-class Inverter:
-    def use():
-        pass
-class Saw:
-    def use():
-        pass
-class Soda:
-    def use():
-        pass
-class BorrowGun:
-    def use():
-        pass
-
-class Handcuff:
-    def use():
-        pass
-class Cigarette:
-    def use():
-        pass
-class Pill:
-    def use():
-        pass
-class Adrenaline:
-    def use():
-        pass
-
 # Global variables
 TERMINAL_WIDTH = os.get_terminal_size()[0]
 CLI_HORIZONTAL_LINE = '='*TERMINAL_WIDTH
@@ -71,6 +29,82 @@ playAgain = "Game ended! Play again? [Y]Yes [N]No"
 invalidInput = "[!] Invalid input\n"
 winIcon = "⭕"
 loseIcon = "❌"
+gunChecked = "Gun is checked and the bullet is viewed"
+mobileChecked = "Mobile is telling you about the gun"
+inverterUsed = "The inverter is used, the bullet is now reversed"
+sawUsed = "The saw is used, current bullet will shoot out x2 damage"
+gunPumped = "Gun is pumped and a bullet come out"
+
+# Class constructions
+class Player:
+    def __init__(self, name):
+        self.playerType = "BOT" if (name == "") else "User"
+        self.name = name
+        self.hp = 10
+        self.items = []
+        self.roundHistory = []
+
+#!!NOT COMPLETE
+class Magnifier:
+    def use(bullets):
+        print(f"{gunChecked}\n{bullets[0]}")
+    def __repr__(self):
+        return ""
+
+class MobilePhone:
+    def use(bullets):
+        whichBullet = random.randint(1,len(bullets))
+        print(f"{mobileChecked}\nThe bullet no. {whichBullet} is {bullets[whichBullet]}")
+    def __repr__(self):
+        return ""
+
+class Inverter:
+    def use(bullets):
+        bullets[0] = 1 if bullets[0] == 0 else 0
+        print(inverterUsed)
+    def __repr__(self):
+        return ""
+
+class Saw:
+    def use(bullets):
+        bullets[0] = bullets[0] * 2
+        print(sawUsed)
+    def __repr__(self):
+        return ""
+
+class Soda:
+    def use(bullets):
+        print(f"{gunPumped}\n{bullets.pop(0)}")
+    def __repr__(self):
+        return ""
+
+class BorrowGun:
+    def use():
+        pass
+    def __repr__(self):
+        return ""
+
+class Handcuff:
+    def use():
+        pass
+    def __repr__(self):
+        return ""
+class Cigarette:
+    def use():
+        pass
+    def __repr__(self):
+        return ""
+class Pill:
+    def use():
+        pass
+    def __repr__(self):
+        return ""
+class Adrenaline:
+    def use():
+        pass
+    def __repr__(self):
+        return ""
+#!!NOT COMPLETE
 
 #> Clear terminal output
 def clearCLI():
@@ -149,8 +183,8 @@ def shootGun(targetHP, bullets):
     bulletFired = bullets.pop(0)
     print(bulletFly)
     time.sleep(2) #!3
-    if bulletFired == 1:
-        targetHP -= 1
+    if (bulletFired == 1) or (bulletFired == 2):
+        targetHP -= bulletFired
         print(hit)
         hitFlag = True
     elif bulletFired == 0:

@@ -136,13 +136,17 @@ def round(players):
     while True:
         #> Check player health, give win
         for idx, player in enumerate(players):
-            if player.hp <= 0:
-                print(f"{player.name}{isDead}")
+            if player.hp < 10:
+                print(f"{player.name}{isDead}\n")
                 time.sleep(2) #!3
-                player.roundHistory.append("⭕")
+                player.roundHistory.append("❌")
 
                 idx = idx + 1
-                players[idx].roundHistory.append("❌")
+                idx = 0 if idx >= len(players) else idx
+
+                players[idx].roundHistory.append("⭕")
+
+                return
 
         #> Check bullets
         if len(bullets) <= 0:
@@ -187,8 +191,10 @@ def program():
         players = resetHealth(players)
         round(players)
 
+        print("Wins")
         for player in players:
-            print(f"Wins\n{player.name}: {player.roundHistory}")
+            print(f"{player.name}: {player.roundHistory}")
+        print()
 
 # MAIN
 program()

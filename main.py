@@ -34,8 +34,10 @@ bulletFly = "= ⁍ "
 hit = " 🩸 HIT"
 nothing = " ⚬ Nothing happended"
 isDead = " is DEAD ☠️"
-playAgain = "Game ended! Play again? [Y/N]"
+playAgain = "Game ended! Play again? [Y]Yes [N]No"
 invalidInput = "[!] Invalid input\n"
+winIcon = "⭕"
+loseIcon = "❌"
 
 #> Clear terminal output
 def clearCLI():
@@ -136,15 +138,15 @@ def round(players):
     while True:
         #> Check player health, give win
         for idx, player in enumerate(players):
-            if player.hp < 10:
+            if player.hp <= 0:
                 print(f"{player.name}{isDead}\n")
                 time.sleep(2) #!3
-                player.roundHistory.append("❌")
+                player.roundHistory.append(loseIcon)
 
                 idx = idx + 1
                 idx = 0 if idx >= len(players) else idx
 
-                players[idx].roundHistory.append("⭕")
+                players[idx].roundHistory.append(winIcon)
 
                 return
 
@@ -182,21 +184,30 @@ def round(players):
 
 #> Whole program logic
 def program():
-    clearCLI()
-    players = initPlayer()
+    while True:
+        clearCLI()
+        players = initPlayer()
 
-    for i in range(0,setRounds()):
-        print(f"Round {1+i}\n{CLI_HORIZONTAL_LINE}")
+        for i in range(0,setRounds()):
+            print(f"Round {1+i}\n{CLI_HORIZONTAL_LINE}")
 
-        players = resetHealth(players)
-        round(players)
+            players = resetHealth(players)
+            round(players)
 
-        print("Wins")
-        for player in players:
-            print(f"{player.name}: {player.roundHistory}")
-        print()
+            print("Wins")
+            for player in players:
+                print(f"{player.name}: {player.roundHistory}")
+            print()
+        
+        while True:
+            inputKey = input(f"{playAgain}\n{inputArrow}")
+            clearCLI()
+            if inputKey == "N":
+                exit(0)
+            elif inputKey == "Y":
+                break
+            else:
+                print(invalidInput)
 
 # MAIN
 program()
-while (input(f"{playAgain}\n{inputArrow}")):
-    program()

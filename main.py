@@ -18,6 +18,39 @@ class Player:
         self.items = []
         self.roundHistory = []
 
+class Magnifier:
+    def use(bullets):
+        pass
+class MobilePhone:
+    def use(bullets):
+        pass
+    
+class Inverter:
+    def use():
+        pass
+class Saw:
+    def use():
+        pass
+class Soda:
+    def use():
+        pass
+class BorrowGun:
+    def use():
+        pass
+
+class Handcuff:
+    def use():
+        pass
+class Cigarette:
+    def use():
+        pass
+class Pill:
+    def use():
+        pass
+class Adrenaline:
+    def use():
+        pass
+
 # Global variables
 TERMINAL_WIDTH = os.get_terminal_size()[0]
 CLI_HORIZONTAL_LINE = '='*TERMINAL_WIDTH
@@ -34,8 +67,10 @@ bulletFly = "= ⁍ "
 hit = " 🩸 HIT"
 nothing = " ⚬ Nothing happended"
 isDead = " is DEAD ☠️"
-playAgain = "Game ended! Play again? [Y/N]"
+playAgain = "Game ended! Play again? [Y]Yes [N]No"
 invalidInput = "[!] Invalid input\n"
+winIcon = "⭕"
+loseIcon = "❌"
 
 #> Clear terminal output
 def clearCLI():
@@ -129,8 +164,26 @@ def useItem(index = 999, playerItem = []):
     pass
 
 #> Turn logic
-def turn(turnFlag, players, bullets):
+def round(players):
+    bullets = []
+    turnFlag = True
+
     while True:
+        #> Check player health, give win
+        for idx, player in enumerate(players):
+            if player.hp <= 0:
+                print(f"{player.name}{isDead}\n")
+                time.sleep(2) #!3
+                player.roundHistory.append(loseIcon)
+
+                idx = idx + 1
+                idx = 0 if idx >= len(players) else idx
+
+                players[idx].roundHistory.append(winIcon)
+
+                return
+
+        #> Check bullets
         if len(bullets) <= 0:
             bullets = gunReload()
         
@@ -147,8 +200,7 @@ def turn(turnFlag, players, bullets):
 
         if actionChar == "G":
             extraTurn = holdGun(selfPlayer, frontPlayer, bullets)
-            if not(extraTurn):
-                return players
+            turnFlag = turnFlag if extraTurn else not(turnFlag)
 
         elif actionChar == "X":
             exit(0)
@@ -163,39 +215,32 @@ def turn(turnFlag, players, bullets):
         else:
             print(invalidInput)
 
-#> Round logic
-def round(players):
-    players = resetHealth(players)
-    turnFlag = True
-    bullets = []
-
-    while True:
-        for idx, player in enumerate(players):
-            if player.hp <= 0:
-                print(f"{player.name}{isDead}")
-                time.sleep(2) #!3
-                player.roundHistory.append("⭕")
-
-                idx = idx + 1
-                players[idx].roundHistory.append("❌")
-                return 
-        
-        players = turn(turnFlag, players, bullets)
-        turnFlag = not(turnFlag)
-
 #> Whole program logic
 def program():
-    clearCLI()
-    players = initPlayer()
+    while True:
+        clearCLI()
+        players = initPlayer()
 
-    for i in range(0,setRounds()):
-        print(f"Round {1+i}\n{CLI_HORIZONTAL_LINE}")
-        round(players)
+        for i in range(0,setRounds()):
+            print(f"Round {1+i}\n{CLI_HORIZONTAL_LINE}")
 
-        for player in players:
-            print(f"Wins\n{player.name}: {player.roundHistory}")
+            players = resetHealth(players)
+            round(players)
+
+            print("Wins")
+            for player in players:
+                print(f"{player.name}: {player.roundHistory}")
+            print()
+        
+        while True:
+            inputKey = input(f"{playAgain}\n{inputArrow}")
+            clearCLI()
+            if inputKey == "N":
+                exit(0)
+            elif inputKey == "Y":
+                break
+            else:
+                print(invalidInput)
 
 # MAIN
 program()
-while (input(f"{playAgain}\n{inputArrow}")):
-    program()

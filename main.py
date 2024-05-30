@@ -49,61 +49,70 @@ class Magnifier:
     def use(bullets):
         print(f"{gunChecked}\n{bullets[0]}")
     def __repr__(self):
-        return ""
+        return "Check the current bullet"
 
 class MobilePhone:
     def use(bullets):
         whichBullet = random.randint(1,len(bullets))
         print(f"{mobileChecked}\nThe bullet no. {whichBullet} is {bullets[whichBullet]}")
     def __repr__(self):
-        return ""
+        return "Someone hint you about the gun's future"
 
 class Inverter:
     def use(bullets):
         bullets[0] = 1 if bullets[0] == 0 else 0
         print(inverterUsed)
     def __repr__(self):
-        return ""
+        return "Invert the type of the current bullet"
 
 class Saw:
     def use(bullets):
         bullets[0] = bullets[0] * 2
         print(sawUsed)
     def __repr__(self):
-        return ""
+        return "Double the damage"
 
 class Soda:
     def use(bullets):
         print(f"{gunPumped}\n{bullets.pop(0)}")
     def __repr__(self):
-        return ""
+        return "Pump the gun and ejects current bullet out"
 
 class BorrowGun:
-    def use():
-        pass
+    def use(bullets):
+        print("Someone gave you a gun but the bullet is unknown")
+        return bullets.insert(0, random.randint(0,1))
     def __repr__(self):
-        return ""
-
-class Handcuff:
-    def use():
-        pass
-    def __repr__(self):
-        return ""
+        return "Borrow a gun with one bullet, 50% chance that bullet is live"
+    
 class Cigarette:
-    def use():
-        pass
+    def use(selfPlayer):
+        selfPlayer.hp = selfPlayer.hp + 1
+        print("Light the cigarette and relax")
     def __repr__(self):
-        return ""
+        return "Gain 1 hp without side effects, relax"
+    
 class Pill:
-    def use():
-        pass
+    def use(selfPlayer):
+        hpGain = 3 if random.randint(0,1) == 1 else -2
+        selfPlayer.hp = selfPlayer.hp + hpGain
+        print("Take a pill, let's see whats next... ")
     def __repr__(self):
-        return ""
+        return "50% gain 3 hp, 50% lose 2 hp"
+    
+class Handcuff:
+    def use(frontPlayer):
+        pass
+        print()
+    def __repr__(self):
+        return "Make front player skips their next turn"
+
 class Adrenaline:
-    def use():
+    def use(frontPlayer):
         pass
+        print()
     def __repr__(self):
-        return ""
+        return "Steal 1 item from front player and use immediately"
 #!!NOT COMPLETE
 
 #> Clear terminal output

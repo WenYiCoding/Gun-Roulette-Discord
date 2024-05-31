@@ -288,7 +288,8 @@ def useItem(index, selfPlayer, frontPlayer, bullets):
         if inputKey == "X":
             return
         elif inputKey == "O":
-            selfPlayer.items[(index - 1)].use(selfPlayer, frontPlayer, bullets)
+            item = selfPlayer.items.pop((index - 1))
+            item.use(selfPlayer, frontPlayer, bullets)
             time.sleep(2)
             clearCLI()
 

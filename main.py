@@ -76,8 +76,6 @@ class Player:
 class Item:
     def __init__(self):
         self.description = ""
-    def use(selfPlayer, frontPlayer, bullets):
-        pass
     def __repr__(self):
         return self.description
 
@@ -85,104 +83,112 @@ class Magnifier(Item):
     def __init__(self):
         super().__init__()
         self.description = magnifierDesc
-    def use(bullets):
+    def use(self, selfPlayer, frontPlayer, bullets):
         print(f"{magnifierUsed}\n{bullets[0]}")
+        time.sleep(2)
 
 class MobilePhone(Item):
     def __init__(self):
         super().__init__()
         self.description = mobilePhoneDesc
-    def use(bullets):
+    def use(self, selfPlayer, frontPlayer, bullets):
         whichBullet = random.randint(1,len(bullets))
         print(f"{mobileUsed}\nThe bullet no. {whichBullet} is {bullets[whichBullet]}")
+        time.sleep(2)
 
 class Inverter(Item):
     def __init__(self):
         super().__init__()
         self.description = inverterDesc
-    def use(bullets):
+    def use(self, selfPlayer, frontPlayer, bullets):
         bullets[0] = 1 if bullets[0] == 0 else 0
         print(inverterUsed)
+        time.sleep(2)
 
 class Saw(Item):
     def __init__(self):
         super().__init__()
         self.description = sawDesc
-    def use(bullets):
+    def use(self, selfPlayer, frontPlayer, bullets):
         bullets[0] = bullets[0] * 2
         print(sawUsed)
+        time.sleep(2)
 
 class Soda(Item):
     def __init__(self):
         super().__init__()
         self.description = sodaDesc
-    def use(bullets):
+    def use(self, selfPlayer, frontPlayer, bullets):
         print(f"{gunUsed}\n{bullets.pop(0)}")
+        time.sleep(2)
 
 class BorrowGun(Item):
     def __init__(self):
         super().__init__()
         self.description = borrowGunDesc
-    def use(bullets):
+    def use(self, selfPlayer, frontPlayer, bullets):
         print(borrowGunUsed)
+        time.sleep(2)
         return bullets.insert(0, random.randint(0,1))
     
 class Cigarette(Item):
     def __init__(self):
         super().__init__()
         self.description = cigaretteDesc
-    def use(selfPlayer):
+    def use(self, selfPlayer, frontPlayer, bullets):
         selfPlayer.hp = selfPlayer.hp + 1
         print(cigaretteUsed)
+        time.sleep(2)
     
 class Pill(Item):
     def __init__(self):
         super().__init__()
         self.description = pillDesc
-    def use(selfPlayer):
+    def use(self, selfPlayer, frontPlayer, bullets):
         hpGain = 3 if random.randint(0,1) == 1 else -2
         selfPlayer.hp = selfPlayer.hp + hpGain
         print(pillUsed)
+        time.sleep(2)
     
 class Handcuff(Item):
     def __init__(self):
         super().__init__()
         self.description = handcuffDesc
-    def use(frontPlayer):
-        pass
+    def use(self, selfPlayer, frontPlayer, bullets):
         print()
+        time.sleep(2)
 
 class Adrenaline(Item):
     def __init__(self):
         super().__init__()
         self.description = adrenalineDesc
-    def use(frontPlayer):
-        pass
+    def use(self, selfPlayer, frontPlayer, bullets):
         print()
+        time.sleep(2)
 #!!NOT COMPLETE
 
 #> Generate an item
 def createItem(idx):
     if idx == 0:
-        return Magnifier
+        return Magnifier()
     elif idx == 1:
-        return MobilePhone
+        return MobilePhone()
     elif idx == 2:
-        return Inverter
+        return Inverter()
     elif idx == 3:
-        return Saw
+        return Saw()
     elif idx == 4:
-        return Soda
+        return Soda()
     elif idx == 5:
-        return BorrowGun
+        return BorrowGun()
     elif idx == 6:
-        return Cigarette
+        return Cigarette()
     elif idx == 7:
-        return Pill
+        return Pill()
     elif idx == 8:
-        return Handcuff
+        return Handcuff()
     elif idx == 9:
-        return Adrenaline
+        return Adrenaline()
     else:
         print(noSuchItem)
 
@@ -345,7 +351,7 @@ def round(players):
         print("< " if turnFlag else "> ", end="")
         print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = ", end="")
         for eachItem in selfPlayer.items:
-            print(eachItem.__name__, end=", ")
+            print(eachItem.__class__.__name__, end=", ")
         print()
         
         actionChar = input(f"{turnOptions}\n{inputArrow}")

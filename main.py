@@ -4,6 +4,7 @@
 #!3 may need seperate Main Menu from Program()
 #!4 clear command not clean becoz \r
 #!5 starting bullets does not force at least one 0 and 1
+#!6 not in use
 
 ## Plans
 #? more player support
@@ -25,7 +26,7 @@ askRounds = "How many rounds do you want to play?"
 inputArrow = ">>> "
 insertBullets = "⁍⁍⁍ ▄︻テ══━一 Inserting bullets... "
 turnOptions = "[G]Use gun [1~8]Use item [X]Exit"
-gunHolding = "You are holding a gun ( -_•)▄︻テ══━一"
+gunHolding = "You are holding a gun ( -_•)▄︻テ══━一\nWho you are going to shoot?"
 gunFired = "You fired a gun ( -_•)▄︻テ══━一💥"
 bulletFly = "= ⁍ "
 hit = " 🩸 HIT"
@@ -248,11 +249,11 @@ def shootGun(targetHP, bullets):
 def useItem(index = 999, playerItem = []):
     pass
 
-#> Player target logic
-def targetPlayer(players):
+#> Player target logic #!6
+""" def targetPlayer(players):
     while True:
         for idx, player in enumerate(players):
-            print(f"[{1 + idx}] {player.name}")
+            print(f"[{1 + idx}] {player.name} (HP = {player.hp})")
         inputKey = input(inputArrow)
         if inputKey.isdigit():
             inputKey = int(inputKey)
@@ -260,6 +261,7 @@ def targetPlayer(players):
                 inputKey = inputKey -1
                 return players[inputKey]
         print(invalidInput)
+ """
 
 #> Turn logic
 def round(players):
@@ -341,6 +343,4 @@ def program():
                 print(invalidInput)
 
 # MAIN
-#program()
-players = initPlayer()
-print(targetPlayer(players))
+program()

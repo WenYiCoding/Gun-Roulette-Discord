@@ -246,6 +246,19 @@ def shootGun(targetHP, bullets):
 def useItem(index = 999, playerItem = []):
     pass
 
+#> Player target logic
+def targetPlayer(players):
+    while True:
+        for idx, player in enumerate(players):
+            print(f"[{1 + idx}] {player.name}")
+        inputKey = input(inputArrow)
+        if inputKey.isdigit():
+            inputKey = int(inputKey)
+            if (inputKey > 0) and (inputKey <= len(players)):
+                inputKey = inputKey -1
+                return players[inputKey]
+        print(invalidInput)
+
 #> Turn logic
 def round(players):
     bullets = []
@@ -326,4 +339,6 @@ def program():
                 print(invalidInput)
 
 # MAIN
-program()
+#program()
+players = initPlayer()
+print(targetPlayer(players))

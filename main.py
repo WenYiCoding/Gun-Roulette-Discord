@@ -34,6 +34,7 @@ nothing = " ⚬ Nothing happended"
 isDead = " is DEAD ☠️"
 playAgain = "Game ended! Play again? [Y]Yes [N]No"
 invalidInput = "[!] Invalid input\n"
+noSuchItem = "[!] No such item"
 winIcon = "⭕"
 loseIcon = "❌"
 
@@ -70,93 +71,94 @@ class Player:
     def __repr__(self) -> str:
         return f"Player type: {self.playerType}\nPlayer name: {self.name}\nPlayer HP: {self.hp}\nPlayer items: {self.items}\nPlayer win history: {self.roundHistory}\n"
 
-""" 
-class Main():
-    def __init__(self, fname, lname):
-class Subclass(Main):
-    def __init__(self, fname, lname):
-        Person.__init__(self, fname, lname)
-
- """
-
 # Item structures
 #!!NOT COMPLETE
 class Item:
     def __init__(self):
         self.description = ""
-        self.useMessage = ""
+    def use(selfPlayer, frontPlayer, bullets):
+        pass
     def __repr__(self):
         return self.description
 
 class Magnifier(Item):
     def __init__(self):
-        super().description = magnifierDesc
-        super().useMessage = magnifierUsed
+        super().__init__()
+        self.description = magnifierDesc
     def use(bullets):
         print(f"{magnifierUsed}\n{bullets[0]}")
 
-class MobilePhone:
+class MobilePhone(Item):
+    def __init__(self):
+        super().__init__()
+        self.description = mobilePhoneDesc
     def use(bullets):
         whichBullet = random.randint(1,len(bullets))
         print(f"{mobileUsed}\nThe bullet no. {whichBullet} is {bullets[whichBullet]}")
-    def __repr__(self):
-        return mobilePhoneDesc
 
-class Inverter:
+class Inverter(Item):
+    def __init__(self):
+        super().__init__()
+        self.description = inverterDesc
     def use(bullets):
         bullets[0] = 1 if bullets[0] == 0 else 0
         print(inverterUsed)
-    def __repr__(self):
-        return inverterDesc
 
-class Saw:
+class Saw(Item):
+    def __init__(self):
+        super().__init__()
+        self.description = sawDesc
     def use(bullets):
         bullets[0] = bullets[0] * 2
         print(sawUsed)
-    def __repr__(self):
-        return sawDesc
 
-class Soda:
+class Soda(Item):
+    def __init__(self):
+        super().__init__()
+        self.description = sodaDesc
     def use(bullets):
         print(f"{gunUsed}\n{bullets.pop(0)}")
-    def __repr__(self):
-        return sodaDesc
 
-class BorrowGun:
+class BorrowGun(Item):
+    def __init__(self):
+        super().__init__()
+        self.description = borrowGunDesc
     def use(bullets):
         print(borrowGunUsed)
         return bullets.insert(0, random.randint(0,1))
-    def __repr__(self):
-        return borrowGunDesc
     
-class Cigarette:
+class Cigarette(Item):
+    def __init__(self):
+        super().__init__()
+        self.description = cigaretteDesc
     def use(selfPlayer):
         selfPlayer.hp = selfPlayer.hp + 1
         print(cigaretteUsed)
-    def __repr__(self):
-        return cigaretteDesc
     
-class Pill:
+class Pill(Item):
+    def __init__(self):
+        super().__init__()
+        self.description = pillDesc
     def use(selfPlayer):
         hpGain = 3 if random.randint(0,1) == 1 else -2
         selfPlayer.hp = selfPlayer.hp + hpGain
         print(pillUsed)
-    def __repr__(self):
-        return pillDesc
     
-class Handcuff:
+class Handcuff(Item):
+    def __init__(self):
+        super().__init__()
+        self.description = handcuffDesc
     def use(frontPlayer):
         pass
         print()
-    def __repr__(self):
-        return handcuffDesc
 
-class Adrenaline:
+class Adrenaline(Item):
+    def __init__(self):
+        super().__init__()
+        self.description = adrenalineDesc
     def use(frontPlayer):
         pass
         print()
-    def __repr__(self):
-        return adrenalineDesc
 #!!NOT COMPLETE
 
 #> Generate an item
@@ -182,7 +184,7 @@ def createItem(idx):
     elif idx == 9:
         return Adrenaline
     else:
-        print("[!] No such item")
+        print(noSuchItem)
 
 #> Clear terminal output
 def clearCLI():
@@ -272,8 +274,23 @@ def shootGun(targetHP, bullets):
     return [targetHP, hitFlag]
 
 #> Item usage logic
-def useItem(index = 999, playerItem = []):
-    pass
+def useItem(index, selfPlayer, frontPlayer, bullets):
+    if index > (len(selfPlayer.items)):
+        print(noSuchItem)
+    else:
+        inputKey = ""
+        while True:
+            print(selfPlayer.items[(index - 1)])
+            inputKey = input(f"[O]Use [X]Keep\n{inputArrow}")
+            clearCLI()
+            if inputKey == "O" or inputKey == "X":
+                break
+            else:
+                print(invalidInput)
+        if inputKey == "X":
+            return
+        elif inputKey == "O":
+            selfPlayer.items[(index - 1)].use(selfPlayer, frontPlayer, bullets)
 
 #> Player target logic #!6
 """ def targetPlayer(players):
@@ -298,6 +315,7 @@ def round(players):
     while True:
         #> Check player health, give win
         for idx, player in enumerate(players):
+            player.items.append(createItem(random.randint(0,9))) #!!DEBUG
             if player.hp <= 0:
                 print(f"{player.name}{isDead}\n")
                 time.sleep(2) #!3
@@ -343,7 +361,7 @@ def round(players):
         elif actionChar.isdigit():
             itemIdx = int(actionChar)
             if (itemIdx > 0) and (itemIdx < 9):
-                useItem(itemIdx)
+                useItem(itemIdx, selfPlayer, frontPlayer, bullets)
             else:
                 print(invalidInput)
 

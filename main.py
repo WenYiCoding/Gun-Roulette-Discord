@@ -62,10 +62,12 @@ adrenalineUsed = ""
 class Player:
     def __init__(self, name):
         self.playerType = "BOT" if (name == "") else "User"
-        self.name = name
+        self.name = name if self.playerType == "User" else "BOT"
         self.hp = 10
         self.items = []
         self.roundHistory = []
+    def __repr__(self) -> str:
+        return f"Player type: {self.playerType}\nPlayer name: {self.name}\nPlayer HP: {self.hp}\nPlayer items: {self.items}\nPlayer win history: {self.roundHistory}\n"
 
 """ 
 class Main():

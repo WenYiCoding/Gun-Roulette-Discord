@@ -59,7 +59,7 @@ handcuffUsed = ""
 adrenalineDesc = "Steal 1 item from front player and use immediately"
 adrenalineUsed = ""
 
-# Class constructions
+# Player structure
 class Player:
     def __init__(self, name):
         self.playerType = "BOT" if (name == "") else "User"
@@ -79,6 +79,7 @@ class Subclass(Main):
 
  """
 
+# Item structures
 #!!NOT COMPLETE
 class Item:
     def __init__(self):
@@ -157,6 +158,31 @@ class Adrenaline:
     def __repr__(self):
         return adrenalineDesc
 #!!NOT COMPLETE
+
+#> Generate an item
+def createItem(idx):
+    if idx == 0:
+        return Magnifier
+    elif idx == 1:
+        return MobilePhone
+    elif idx == 2:
+        return Inverter
+    elif idx == 3:
+        return Saw
+    elif idx == 4:
+        return Soda
+    elif idx == 5:
+        return BorrowGun
+    elif idx == 6:
+        return Cigarette
+    elif idx == 7:
+        return Pill
+    elif idx == 8:
+        return Handcuff
+    elif idx == 9:
+        return Adrenaline
+    else:
+        print("[!] No such item")
 
 #> Clear terminal output
 def clearCLI():
@@ -267,6 +293,7 @@ def useItem(index = 999, playerItem = []):
 def round(players):
     bullets = []
     turnFlag = True
+    firstCycleFlag = True
 
     while True:
         #> Check player health, give win
@@ -285,6 +312,11 @@ def round(players):
 
         #> Check bullets
         if len(bullets) <= 0:
+            if firstCycleFlag:
+                firstCycleFlag = not(firstCycleFlag)
+            else:
+                for player in players:
+                    player.items.append(createItem(random.randint(0,9)))
             bullets = gunReload()
         
         print(f"{players[0].name}:{players[0].hp} | {players[1].name}:{players[1].hp}\n")
@@ -293,7 +325,10 @@ def round(players):
         frontPlayer = players[1] if turnFlag else players[0]
 
         print("< " if turnFlag else "> ", end="")
-        print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = {selfPlayer.items}")
+        print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = ", end="")
+        for eachItem in selfPlayer.items:
+            print(eachItem.__name__, end=", ")
+        print()
         
         actionChar = input(f"{turnOptions}\n{inputArrow}")
         clearCLI()

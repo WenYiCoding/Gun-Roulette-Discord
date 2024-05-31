@@ -1,8 +1,14 @@
+## Notes
 #!1 Later: Seperate some function to other py file for GUI
 #!2 User can type while time.sleep
 #!3 may need seperate Main Menu from Program()
 #!4 clear command not clean becoz \r
 #!5 starting bullets does not force at least one 0 and 1
+
+## Plans
+#? more player support
+#? item modding support
+#? rules configuration
 
 # Library imports
 import os
@@ -29,11 +35,28 @@ playAgain = "Game ended! Play again? [Y]Yes [N]No"
 invalidInput = "[!] Invalid input\n"
 winIcon = "⭕"
 loseIcon = "❌"
-gunChecked = "Gun is checked and the bullet is viewed"
-mobileChecked = "Mobile is telling you about the gun"
+
+# Message Strings: Items
+magnifierDesc = "Check the current bullet"
+magnifierUsed = "Gun is checked and the bullet is viewed"
+mobilePhoneDesc = "Someone hint you about the gun's future"
+mobileUsed = "Mobile is telling you about the gun"
+inverterDesc = "Invert the type of the current bullet"
 inverterUsed = "The inverter is used, the bullet is now reversed"
+sawDesc = "Double the damage"
 sawUsed = "The saw is used, current bullet will shoot out x2 damage"
-gunPumped = "Gun is pumped and a bullet come out"
+sodaDesc = "Pump the gun and ejects current bullet out"
+gunUsed = "Gun is pumped and a bullet come out"
+borrowGunDesc = "Borrow a gun with one bullet, 50% chance that bullet is live"
+borrowGunUsed = "Someone gave you a gun but the bullet is unknown"
+cigaretteDesc = "Gain 1 hp without side effects, relax"
+cigaretteUsed = "Light the cigarette and relax"
+pillDesc = "50% gain 3 hp, 50% lose 2 hp"
+pillUsed = "Take a pill, let's see whats next... "
+handcuffDesc = "Make front player skips their next turn"
+handcuffUsed = ""
+adrenalineDesc = "Steal 1 item from front player and use immediately"
+adrenalineUsed = ""
 
 # Class constructions
 class Player:
@@ -44,75 +67,92 @@ class Player:
         self.items = []
         self.roundHistory = []
 
+""" 
+class Main():
+    def __init__(self, fname, lname):
+class Subclass(Main):
+    def __init__(self, fname, lname):
+        Person.__init__(self, fname, lname)
+
+ """
+
 #!!NOT COMPLETE
-class Magnifier:
-    def use(bullets):
-        print(f"{gunChecked}\n{bullets[0]}")
+class Item:
+    def __init__(self):
+        self.description = ""
+        self.useMessage = ""
     def __repr__(self):
-        return "Check the current bullet"
+        return self.description
+
+class Magnifier(Item):
+    def __init__(self):
+        super().description = magnifierDesc
+        super().useMessage = magnifierUsed
+    def use(bullets):
+        print(f"{magnifierUsed}\n{bullets[0]}")
 
 class MobilePhone:
     def use(bullets):
         whichBullet = random.randint(1,len(bullets))
-        print(f"{mobileChecked}\nThe bullet no. {whichBullet} is {bullets[whichBullet]}")
+        print(f"{mobileUsed}\nThe bullet no. {whichBullet} is {bullets[whichBullet]}")
     def __repr__(self):
-        return "Someone hint you about the gun's future"
+        return mobilePhoneDesc
 
 class Inverter:
     def use(bullets):
         bullets[0] = 1 if bullets[0] == 0 else 0
         print(inverterUsed)
     def __repr__(self):
-        return "Invert the type of the current bullet"
+        return inverterDesc
 
 class Saw:
     def use(bullets):
         bullets[0] = bullets[0] * 2
         print(sawUsed)
     def __repr__(self):
-        return "Double the damage"
+        return sawDesc
 
 class Soda:
     def use(bullets):
-        print(f"{gunPumped}\n{bullets.pop(0)}")
+        print(f"{gunUsed}\n{bullets.pop(0)}")
     def __repr__(self):
-        return "Pump the gun and ejects current bullet out"
+        return sodaDesc
 
 class BorrowGun:
     def use(bullets):
-        print("Someone gave you a gun but the bullet is unknown")
+        print(borrowGunUsed)
         return bullets.insert(0, random.randint(0,1))
     def __repr__(self):
-        return "Borrow a gun with one bullet, 50% chance that bullet is live"
+        return borrowGunDesc
     
 class Cigarette:
     def use(selfPlayer):
         selfPlayer.hp = selfPlayer.hp + 1
-        print("Light the cigarette and relax")
+        print(cigaretteUsed)
     def __repr__(self):
-        return "Gain 1 hp without side effects, relax"
+        return cigaretteDesc
     
 class Pill:
     def use(selfPlayer):
         hpGain = 3 if random.randint(0,1) == 1 else -2
         selfPlayer.hp = selfPlayer.hp + hpGain
-        print("Take a pill, let's see whats next... ")
+        print(pillUsed)
     def __repr__(self):
-        return "50% gain 3 hp, 50% lose 2 hp"
+        return pillDesc
     
 class Handcuff:
     def use(frontPlayer):
         pass
         print()
     def __repr__(self):
-        return "Make front player skips their next turn"
+        return handcuffDesc
 
 class Adrenaline:
     def use(frontPlayer):
         pass
         print()
     def __repr__(self):
-        return "Steal 1 item from front player and use immediately"
+        return adrenalineDesc
 #!!NOT COMPLETE
 
 #> Clear terminal output

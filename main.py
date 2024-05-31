@@ -85,7 +85,6 @@ class Magnifier(Item):
         self.description = magnifierDesc
     def use(self, selfPlayer, frontPlayer, bullets):
         print(f"{magnifierUsed}\n{bullets[0]}")
-        time.sleep(2)
 
 class MobilePhone(Item):
     def __init__(self):
@@ -94,7 +93,6 @@ class MobilePhone(Item):
     def use(self, selfPlayer, frontPlayer, bullets):
         whichBullet = random.randint(1,len(bullets))
         print(f"{mobileUsed}\nThe bullet no. {whichBullet} is {bullets[whichBullet]}")
-        time.sleep(2)
 
 class Inverter(Item):
     def __init__(self):
@@ -103,7 +101,6 @@ class Inverter(Item):
     def use(self, selfPlayer, frontPlayer, bullets):
         bullets[0] = 1 if bullets[0] == 0 else 0
         print(inverterUsed)
-        time.sleep(2)
 
 class Saw(Item):
     def __init__(self):
@@ -112,7 +109,6 @@ class Saw(Item):
     def use(self, selfPlayer, frontPlayer, bullets):
         bullets[0] = bullets[0] * 2
         print(sawUsed)
-        time.sleep(2)
 
 class Soda(Item):
     def __init__(self):
@@ -120,7 +116,6 @@ class Soda(Item):
         self.description = sodaDesc
     def use(self, selfPlayer, frontPlayer, bullets):
         print(f"{gunUsed}\n{bullets.pop(0)}")
-        time.sleep(2)
 
 class BorrowGun(Item):
     def __init__(self):
@@ -128,7 +123,6 @@ class BorrowGun(Item):
         self.description = borrowGunDesc
     def use(self, selfPlayer, frontPlayer, bullets):
         print(borrowGunUsed)
-        time.sleep(2)
         return bullets.insert(0, random.randint(0,1))
     
 class Cigarette(Item):
@@ -138,7 +132,6 @@ class Cigarette(Item):
     def use(self, selfPlayer, frontPlayer, bullets):
         selfPlayer.hp = selfPlayer.hp + 1
         print(cigaretteUsed)
-        time.sleep(2)
     
 class Pill(Item):
     def __init__(self):
@@ -148,23 +141,22 @@ class Pill(Item):
         hpGain = 3 if random.randint(0,1) == 1 else -2
         selfPlayer.hp = selfPlayer.hp + hpGain
         print(pillUsed)
-        time.sleep(2)
     
 class Handcuff(Item):
     def __init__(self):
         super().__init__()
         self.description = handcuffDesc
     def use(self, selfPlayer, frontPlayer, bullets):
+        pass
         print()
-        time.sleep(2)
 
 class Adrenaline(Item):
     def __init__(self):
         super().__init__()
         self.description = adrenalineDesc
     def use(self, selfPlayer, frontPlayer, bullets):
+        pass
         print()
-        time.sleep(2)
 #!!NOT COMPLETE
 
 #> Generate an item
@@ -297,6 +289,8 @@ def useItem(index, selfPlayer, frontPlayer, bullets):
             return
         elif inputKey == "O":
             selfPlayer.items[(index - 1)].use(selfPlayer, frontPlayer, bullets)
+            time.sleep(2)
+            clearCLI()
 
 #> Player target logic #!6
 """ def targetPlayer(players):

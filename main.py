@@ -60,6 +60,7 @@ handcuffDesc = "Make front player skips their next turn"
 handcuffUsed = ""
 adrenalineDesc = "Steal 1 item from front player and use immediately"
 adrenalineUsed = ""
+adrenalineNotUsed = "No items to steal"
 
 # Player structure
 class Player:
@@ -165,18 +166,22 @@ class Adrenaline(Item):
         super().__init__()
         self.description = adrenalineDesc
     def use(self, selfPlayer, frontPlayer, bullets):
-        while True:
-            for idx, eachItem in enumerate(frontPlayer.items):
-                print(f"[{1+ idx}] {eachItem.__class__.__name__}")
-            inputKey = input(inputArrow)
-            if inputKey.isdigit():
-                inputKey = int(inputKey)
-                if (inputKey > 0 and inputKey <= len(frontPlayer.items)):
-                    frontPlayer.items.pop(inputKey -1).use(selfPlayer, frontPlayer, bullets)
+        if len(frontPlayer) <= 0:
+            print(adrenalineNotUsed)
+            selfPlayer.items.append(Adrenaline())
+        else:
+            while True:
+                for idx, eachItem in enumerate(frontPlayer.items):
+                    print(f"[{1+ idx}] {eachItem.__class__.__name__}")
+                inputKey = input(inputArrow)
+                if inputKey.isdigit():
+                    inputKey = int(inputKey)
+                    if (inputKey > 0 and inputKey <= len(frontPlayer.items)):
+                        frontPlayer.items.pop(inputKey -1).use(selfPlayer, frontPlayer, bullets)
+                    else:
+                        print(invalidInput)
                 else:
                     print(invalidInput)
-            else:
-                print(invalidInput)
 
 #> Generate an item
 def createItem(idx):

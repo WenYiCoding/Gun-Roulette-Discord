@@ -79,6 +79,7 @@ class Item:
     def __repr__(self):
         return self.description
 
+#can use
 class Magnifier(Item):
     def __init__(self):
         super().__init__()
@@ -91,9 +92,10 @@ class MobilePhone(Item):
         super().__init__()
         self.description = mobilePhoneDesc
     def use(self, selfPlayer, frontPlayer, bullets):
-        whichBullet = (random.randint(1,len(bullets)) -1)
-        print(f"{mobileUsed}\nThe bullet no. {whichBullet} is {bullets[whichBullet]}")
+        whichBullet = random.randint(2,len(bullets))
+        print(f"{mobileUsed}\nThe bullet no. {whichBullet} is {bullets[(whichBullet -1)]}")
 
+#can use
 class Inverter(Item):
     def __init__(self):
         super().__init__()
@@ -119,6 +121,7 @@ class Beer(Item):
     def use(self, selfPlayer, frontPlayer, bullets):
         print(f"{gunUsed}\n{bullets.pop(0)}")
 
+#can use
 class BorrowGun(Item):
     def __init__(self):
         super().__init__()
@@ -133,8 +136,11 @@ class Cigarette(Item):
         super().__init__()
         self.description = cigaretteDesc
     def use(self, selfPlayer, frontPlayer, bullets):
-        selfPlayer.hp = selfPlayer.hp + 1
-        print(cigaretteUsed)
+        if selfPlayer.hp < 10:
+            selfPlayer.hp = selfPlayer.hp + 1
+            print(cigaretteUsed)
+        else:
+            selfPlayer.items.append(Cigarette())
     
 class Pill(Item):
     def __init__(self):

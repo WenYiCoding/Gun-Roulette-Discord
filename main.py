@@ -59,8 +59,9 @@ maxHealth = "The health is maxed out, putting the item back"
 handcuffDesc = "Make front player skips their next turn"
 handcuffUsed = ""
 adrenalineDesc = "Steal 1 item from front player and use immediately"
-adrenalineUsed = ""
+adrenalineUsed = "Quick! Steal something already"
 adrenalineNotUsed = "No items to steal"
+cannotSteal = "This item cannot be stolen"
 
 # Player structure
 class Player:
@@ -149,7 +150,7 @@ class Pill(Item):
             selfPlayer.hp = selfPlayer.hp + hpGain
             print(pillUsed)
         else:
-            selfPlayer.items.append(Cigarette())
+            selfPlayer.items.append(Pill())
             print(maxHealth)
     
 #!!NOT COMPLETE
@@ -166,18 +167,24 @@ class Adrenaline(Item):
         super().__init__()
         self.description = adrenalineDesc
     def use(self, selfPlayer, frontPlayer, bullets):
-        if len(frontPlayer) <= 0:
+        if len(frontPlayer.items) <= 0:
             print(adrenalineNotUsed)
             selfPlayer.items.append(Adrenaline())
         else:
+            print(adrenalineUsed)
             while True:
                 for idx, eachItem in enumerate(frontPlayer.items):
                     print(f"[{1+ idx}] {eachItem.__class__.__name__}")
                 inputKey = input(inputArrow)
+                clearCLI()
                 if inputKey.isdigit():
                     inputKey = int(inputKey)
                     if (inputKey > 0 and inputKey <= len(frontPlayer.items)):
-                        frontPlayer.items.pop(inputKey -1).use(selfPlayer, frontPlayer, bullets)
+                        if frontPlayer.items[inputKey -1].__class__.__name__ != "Adrenaline":
+                            frontPlayer.items.pop(inputKey -1).use(selfPlayer, frontPlayer, bullets)
+                            return
+                        else:
+                            print(cannotSteal)
                     else:
                         print(invalidInput)
                 else:
@@ -367,6 +374,8 @@ def round(players):
         frontPlayer = players[1] if turnFlag else players[0]
 
         selfPlayer.items.append(Adrenaline()) #!!DEBUG
+        frontPlayer.items.append(Adrenaline()) #!!DEBUG
+        frontPlayer.items.append(createItem(random.randint(0,9))) #!!DEBUG
 
         print("< " if turnFlag else "> ", end="")
         print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = ", end="")

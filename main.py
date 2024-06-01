@@ -55,10 +55,13 @@ cigaretteDesc = "Gain 1 hp without side effects, relax"
 cigaretteUsed = "Light the cigarette and relax"
 pillDesc = "50% gain 3 hp, 50% lose 2 hp"
 pillUsed = "Take a pill, let's see whats next... "
+maxHealth = "The health is maxed out, putting the item back"
 handcuffDesc = "Make front player skips their next turn"
 handcuffUsed = ""
 adrenalineDesc = "Steal 1 item from front player and use immediately"
-adrenalineUsed = ""
+adrenalineUsed = "Quick! Steal something already"
+adrenalineNotUsed = "No items to steal"
+cannotSteal = "This item cannot be stolen"
 
 # Player structure
 class Player:
@@ -72,7 +75,6 @@ class Player:
         return f"Player type: {self.playerType}\nPlayer name: {self.name}\nPlayer HP: {self.hp}\nPlayer items: {self.items}\nPlayer win history: {self.roundHistory}\n"
 
 # Item structures
-#!!NOT COMPLETE
 class Item:
     def __init__(self):
         self.description = ""
@@ -91,8 +93,9 @@ class MobilePhone(Item):
         super().__init__()
         self.description = mobilePhoneDesc
     def use(self, selfPlayer, frontPlayer, bullets):
-        whichBullet = random.randint(1,len(bullets))
-        print(f"{mobileUsed}\nThe bullet no. {whichBullet} is {bullets[whichBullet]}")
+        whichBullet = random.randint(2,len(bullets))
+        bulletLive = "LIVE" if bullets[(whichBullet -1)] == 1 else "BLANK"
+        print(f"{mobileUsed}\nThe bullet no. {whichBullet} is {bulletLive}")
 
 class Inverter(Item):
     def __init__(self):
@@ -110,7 +113,7 @@ class Saw(Item):
         bullets[0] = bullets[0] * 2
         print(sawUsed)
 
-class Soda(Item):
+class Beer(Item):
     def __init__(self):
         super().__init__()
         self.description = sodaDesc
@@ -124,40 +127,68 @@ class BorrowGun(Item):
     def use(self, selfPlayer, frontPlayer, bullets):
         print(borrowGunUsed)
         return bullets.insert(0, random.randint(0,1))
-    
+
 class Cigarette(Item):
     def __init__(self):
         super().__init__()
         self.description = cigaretteDesc
     def use(self, selfPlayer, frontPlayer, bullets):
-        selfPlayer.hp = selfPlayer.hp + 1
-        print(cigaretteUsed)
+        if selfPlayer.hp < 10:
+            selfPlayer.hp = selfPlayer.hp + 1
+            print(cigaretteUsed)
+        else:
+            selfPlayer.items.append(Cigarette())
+            print(maxHealth)
     
 class Pill(Item):
     def __init__(self):
         super().__init__()
         self.description = pillDesc
     def use(self, selfPlayer, frontPlayer, bullets):
-        hpGain = 3 if random.randint(0,1) == 1 else -2
-        selfPlayer.hp = selfPlayer.hp + hpGain
-        print(pillUsed)
+        if selfPlayer.hp < 10:
+            hpGain = 3 if random.randint(0,1) == 1 else -2
+            selfPlayer.hp = selfPlayer.hp + hpGain
+            print(pillUsed)
+        else:
+            selfPlayer.items.append(Pill())
+            print(maxHealth)
     
+#!!NOT COMPLETE
 class Handcuff(Item):
     def __init__(self):
         super().__init__()
         self.description = handcuffDesc
     def use(self, selfPlayer, frontPlayer, bullets):
-        pass
         print()
 
+#!!NOT COMPLETE
 class Adrenaline(Item):
     def __init__(self):
         super().__init__()
         self.description = adrenalineDesc
     def use(self, selfPlayer, frontPlayer, bullets):
-        pass
-        print()
-#!!NOT COMPLETE
+        if len(frontPlayer.items) <= 0:
+            print(adrenalineNotUsed)
+            selfPlayer.items.append(Adrenaline())
+        else:
+            print(adrenalineUsed)
+            while True:
+                for idx, eachItem in enumerate(frontPlayer.items):
+                    print(f"[{1+ idx}] {eachItem.__class__.__name__}")
+                inputKey = input(inputArrow)
+                clearCLI()
+                if inputKey.isdigit():
+                    inputKey = int(inputKey)
+                    if (inputKey > 0 and inputKey <= len(frontPlayer.items)):
+                        if frontPlayer.items[inputKey -1].__class__.__name__ != "Adrenaline":
+                            frontPlayer.items.pop(inputKey -1).use(selfPlayer, frontPlayer, bullets)
+                            return
+                        else:
+                            print(cannotSteal)
+                    else:
+                        print(invalidInput)
+                else:
+                    print(invalidInput)
 
 #> Generate an item
 def createItem(idx):
@@ -170,7 +201,7 @@ def createItem(idx):
     elif idx == 3:
         return Saw()
     elif idx == 4:
-        return Soda()
+        return Beer()
     elif idx == 5:
         return BorrowGun()
     elif idx == 6:
@@ -316,7 +347,6 @@ def round(players):
     while True:
         #> Check player health, give win
         for idx, player in enumerate(players):
-            player.items.append(createItem(random.randint(0,9))) #!!DEBUG
             if player.hp <= 0:
                 print(f"{player.name}{isDead}\n")
                 time.sleep(2) #!3
@@ -329,7 +359,7 @@ def round(players):
 
                 return
 
-        #> Check bullets
+        #> Check bullets and run cycle
         if len(bullets) <= 0:
             if firstCycleFlag:
                 firstCycleFlag = not(firstCycleFlag)
@@ -342,6 +372,10 @@ def round(players):
 
         selfPlayer = players[0] if turnFlag else players[1]
         frontPlayer = players[1] if turnFlag else players[0]
+
+        selfPlayer.items.append(Adrenaline()) #!!DEBUG
+        frontPlayer.items.append(Adrenaline()) #!!DEBUG
+        frontPlayer.items.append(createItem(random.randint(0,9))) #!!DEBUG
 
         print("< " if turnFlag else "> ", end="")
         print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = ", end="")

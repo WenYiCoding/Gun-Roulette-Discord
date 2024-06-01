@@ -61,6 +61,7 @@ handcuffUsed = ""
 adrenalineDesc = "Steal 1 item from front player and use immediately"
 adrenalineUsed = "Quick! Steal something already"
 adrenalineNotUsed = "No items to steal"
+adrenalineGiveUp = "Give up stealing? What a nice person you are"
 cannotSteal = "This item cannot be stolen"
 
 # Player structure
@@ -161,7 +162,7 @@ class Handcuff(Item):
     def use(self, selfPlayer, frontPlayer, bullets):
         print()
 
-#!!NOT COMPLETE
+#! Contain hardcode
 class Adrenaline(Item):
     def __init__(self):
         super().__init__()
@@ -175,18 +176,25 @@ class Adrenaline(Item):
             while True:
                 for idx, eachItem in enumerate(frontPlayer.items):
                     print(f"[{1+ idx}] {eachItem.__class__.__name__}")
+                print("[X] Give up stealing")
                 inputKey = input(inputArrow)
                 clearCLI()
                 if inputKey.isdigit():
                     inputKey = int(inputKey)
                     if (inputKey > 0 and inputKey <= len(frontPlayer.items)):
-                        if frontPlayer.items[inputKey -1].__class__.__name__ != "Adrenaline":
+                        itemName = frontPlayer.items[inputKey -1].__class__.__name__
+                        if itemName == "Adrenaline":
+                            print(cannotSteal)
+                        elif (itemName == "Cigarette" or itemName == "Pill") and selfPlayer.hp >= 10:
+                            print(maxHealth)
+                        else:
                             frontPlayer.items.pop(inputKey -1).use(selfPlayer, frontPlayer, bullets)
                             return
-                        else:
-                            print(cannotSteal)
                     else:
                         print(invalidInput)
+                elif inputKey == "X":
+                    print(adrenalineGiveUp)
+                    return
                 else:
                     print(invalidInput)
 
@@ -269,18 +277,18 @@ def resetHealth(players):
 
 #> Hold gun
 def holdGun(selfPlayer, frontPlayer, bullets):
-    actionKey = ""
+    inputKey = ""
 
     print(gunHolding)
-    while actionKey != "X" and actionKey != "O":
-        print(invalidInput if actionKey != "" else "")
-        actionKey = input(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
+    while inputKey != "X" and inputKey != "O":
+        print(invalidInput if inputKey != "" else "")
+        inputKey = input(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
         clearCLI()
-    if actionKey == "X":
+    if inputKey == "X":
         result = shootGun(frontPlayer.hp, bullets)
         frontPlayer.hp = result[0]
         return result[1]
-    elif actionKey == "O":
+    elif inputKey == "O":
         result = shootGun(selfPlayer.hp, bullets)
         selfPlayer.hp = result[0]
         return not(result[1])
@@ -373,9 +381,10 @@ def round(players):
         selfPlayer = players[0] if turnFlag else players[1]
         frontPlayer = players[1] if turnFlag else players[0]
 
-        selfPlayer.items.append(Adrenaline()) #!!DEBUG
-        frontPlayer.items.append(Adrenaline()) #!!DEBUG
-        frontPlayer.items.append(createItem(random.randint(0,9))) #!!DEBUG
+        print("Front player's items: ", end="")
+        for eachItem in frontPlayer.items:
+            print(eachItem.__class__.__name__, end=", ")
+        print()
 
         print("< " if turnFlag else "> ", end="")
         print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = ", end="")
@@ -383,18 +392,18 @@ def round(players):
             print(eachItem.__class__.__name__, end=", ")
         print()
         
-        actionChar = input(f"{turnOptions}\n{inputArrow}")
+        inputKey = input(f"{turnOptions}\n{inputArrow}")
         clearCLI()
 
-        if actionChar == "G":
+        if inputKey == "G":
             extraTurn = holdGun(selfPlayer, frontPlayer, bullets)
             turnFlag = turnFlag if extraTurn else not(turnFlag)
 
-        elif actionChar == "X":
+        elif inputKey == "X":
             exit(0)
 
-        elif actionChar.isdigit():
-            itemIdx = int(actionChar)
+        elif inputKey.isdigit():
+            itemIdx = int(inputKey)
             if (itemIdx > 0) and (itemIdx < 9):
                 useItem(itemIdx, selfPlayer, frontPlayer, bullets)
             else:

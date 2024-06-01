@@ -53,6 +53,7 @@ borrowGunDesc = "Borrow a gun with one bullet, 50% chance that bullet is live"
 borrowGunUsed = "Someone gave you a gun but the bullet is unknown"
 cigaretteDesc = "Gain 1 hp without side effects, relax"
 cigaretteUsed = "Light the cigarette and relax"
+cigaretteNotUsed = "The health is maxed out, putting the item back"
 pillDesc = "50% gain 3 hp, 50% lose 2 hp"
 pillUsed = "Take a pill, let's see whats next... "
 handcuffDesc = "Make front player skips their next turn"
@@ -93,7 +94,8 @@ class MobilePhone(Item):
         self.description = mobilePhoneDesc
     def use(self, selfPlayer, frontPlayer, bullets):
         whichBullet = random.randint(2,len(bullets))
-        print(f"{mobileUsed}\nThe bullet no. {whichBullet} is {bullets[(whichBullet -1)]}")
+        bulletLive = "LIVE" if bullets[(whichBullet -1)] == 1 else "BLANK"
+        print(f"{mobileUsed}\nThe bullet no. {whichBullet} is {bulletLive}")
 
 #can use
 class Inverter(Item):
@@ -130,7 +132,7 @@ class BorrowGun(Item):
         print(borrowGunUsed)
         return bullets.insert(0, random.randint(0,1))
 
-#can use #! need set max hp
+#can use
 class Cigarette(Item):
     def __init__(self):
         super().__init__()
@@ -141,6 +143,7 @@ class Cigarette(Item):
             print(cigaretteUsed)
         else:
             selfPlayer.items.append(Cigarette())
+            print(cigaretteNotUsed)
     
 class Pill(Item):
     def __init__(self):

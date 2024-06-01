@@ -91,7 +91,7 @@ class MobilePhone(Item):
         super().__init__()
         self.description = mobilePhoneDesc
     def use(self, selfPlayer, frontPlayer, bullets):
-        whichBullet = random.randint(1,len(bullets))
+        whichBullet = (random.randint(1,len(bullets)) -1)
         print(f"{mobileUsed}\nThe bullet no. {whichBullet} is {bullets[whichBullet]}")
 
 class Inverter(Item):
@@ -102,6 +102,7 @@ class Inverter(Item):
         bullets[0] = 1 if bullets[0] == 0 else 0
         print(inverterUsed)
 
+#can use
 class Saw(Item):
     def __init__(self):
         super().__init__()
@@ -110,7 +111,8 @@ class Saw(Item):
         bullets[0] = bullets[0] * 2
         print(sawUsed)
 
-class Soda(Item):
+#can use
+class Beer(Item):
     def __init__(self):
         super().__init__()
         self.description = sodaDesc
@@ -124,7 +126,8 @@ class BorrowGun(Item):
     def use(self, selfPlayer, frontPlayer, bullets):
         print(borrowGunUsed)
         return bullets.insert(0, random.randint(0,1))
-    
+
+#can use #! need set max hp
 class Cigarette(Item):
     def __init__(self):
         super().__init__()
@@ -170,7 +173,7 @@ def createItem(idx):
     elif idx == 3:
         return Saw()
     elif idx == 4:
-        return Soda()
+        return Beer()
     elif idx == 5:
         return BorrowGun()
     elif idx == 6:

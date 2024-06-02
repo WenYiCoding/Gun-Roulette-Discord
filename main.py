@@ -5,6 +5,8 @@
 #!4 clear command not clean becoz \r
 #!5 starting bullets does not force at least one 0 and 1
 #!6 not in use
+#! contain some hardcode, need revamp
+#! bad state management, need revamp
 
 ## Plans
 #? more player support
@@ -86,14 +88,14 @@ class Magnifier(Item):
     def __init__(self):
         super().__init__()
         self.description = magnifierDesc
-    def use(self, selfPlayer, frontPlayer, bullets):
+    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         print(f"{magnifierUsed}\n{bullets[0]}")
 
 class MobilePhone(Item):
     def __init__(self):
         super().__init__()
         self.description = mobilePhoneDesc
-    def use(self, selfPlayer, frontPlayer, bullets):
+    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         whichBullet = random.randint(2,len(bullets))
         bulletLive = "LIVE" if bullets[(whichBullet -1)] == 1 else "BLANK"
         print(f"{mobileUsed}\nThe bullet no. {whichBullet} is {bulletLive}")
@@ -102,7 +104,7 @@ class Inverter(Item):
     def __init__(self):
         super().__init__()
         self.description = inverterDesc
-    def use(self, selfPlayer, frontPlayer, bullets):
+    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         bullets[0] = 1 if bullets[0] == 0 else 0
         print(inverterUsed)
 
@@ -110,7 +112,7 @@ class Saw(Item):
     def __init__(self):
         super().__init__()
         self.description = sawDesc
-    def use(self, selfPlayer, frontPlayer, bullets):
+    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         bullets[0] = bullets[0] * 2
         print(sawUsed)
 
@@ -118,22 +120,22 @@ class Beer(Item):
     def __init__(self):
         super().__init__()
         self.description = sodaDesc
-    def use(self, selfPlayer, frontPlayer, bullets):
+    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         print(f"{gunUsed}\n{bullets.pop(0)}")
 
 class BorrowGun(Item):
     def __init__(self):
         super().__init__()
         self.description = borrowGunDesc
-    def use(self, selfPlayer, frontPlayer, bullets):
+    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         print(borrowGunUsed)
-        return bullets.insert(0, random.randint(0,1))
+        bullets.insert(0, random.randint(0,1))
 
 class Cigarette(Item):
     def __init__(self):
         super().__init__()
         self.description = cigaretteDesc
-    def use(self, selfPlayer, frontPlayer, bullets):
+    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         if selfPlayer.hp < 10:
             selfPlayer.hp = selfPlayer.hp + 1
             print(cigaretteUsed)
@@ -145,7 +147,7 @@ class Pill(Item):
     def __init__(self):
         super().__init__()
         self.description = pillDesc
-    def use(self, selfPlayer, frontPlayer, bullets):
+    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         if selfPlayer.hp < 10:
             hpGain = 3 if random.randint(0,1) == 1 else -2
             selfPlayer.hp = selfPlayer.hp + hpGain
@@ -159,15 +161,15 @@ class Handcuff(Item):
     def __init__(self):
         super().__init__()
         self.description = handcuffDesc
-    def use(self, selfPlayer, frontPlayer, bullets):
-        print()
+    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
+        print(handcuffUsed)
+        return ["turnFlag", turnFlag +1]
 
-#! Contain hardcode
 class Adrenaline(Item):
     def __init__(self):
         super().__init__()
         self.description = adrenalineDesc
-    def use(self, selfPlayer, frontPlayer, bullets):
+    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         if len(frontPlayer.items) <= 0:
             print(adrenalineNotUsed)
             selfPlayer.items.append(Adrenaline())
@@ -311,7 +313,7 @@ def shootGun(targetHP, bullets):
     return [targetHP, hitFlag]
 
 #> Item usage logic
-def useItem(index, selfPlayer, frontPlayer, bullets):
+def useItem(index, selfPlayer, frontPlayer, bullets, turnFlag):
     if index > (len(selfPlayer.items)):
         print(noSuchItem)
     else:
@@ -328,9 +330,10 @@ def useItem(index, selfPlayer, frontPlayer, bullets):
             return
         elif inputKey == "O":
             item = selfPlayer.items.pop((index - 1))
-            item.use(selfPlayer, frontPlayer, bullets)
+            result = item.use(selfPlayer, frontPlayer, bullets, turnFlag)
             time.sleep(2)
             clearCLI()
+            return result
 
 #> Player target logic #!6
 """ def targetPlayer(players):
@@ -349,8 +352,12 @@ def useItem(index, selfPlayer, frontPlayer, bullets):
 #> Turn logic
 def round(players):
     bullets = []
-    turnFlag = True
+    turnFlag = 1
+    arrowFlag = True
     firstCycleFlag = True
+
+    selfPlayer = players[0]
+    frontPlayer = players[1]
 
     while True:
         #> Check player health, give win
@@ -378,15 +385,19 @@ def round(players):
         
         print(f"{players[0].name}:{players[0].hp} | {players[1].name}:{players[1].hp}\n")
 
-        selfPlayer = players[0] if turnFlag else players[1]
-        frontPlayer = players[1] if turnFlag else players[0]
+        if turnFlag == 0:
+            tempPlayer = selfPlayer
+            selfPlayer = frontPlayer
+            frontPlayer = tempPlayer
+            turnFlag = turnFlag +1
+            arrowFlag = not(arrowFlag)
 
         print("Front player's items: ", end="")
         for eachItem in frontPlayer.items:
             print(eachItem.__class__.__name__, end=", ")
         print()
 
-        print("< " if turnFlag else "> ", end="")
+        print("<- " if arrowFlag else "-> ", end="")
         print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = ", end="")
         for eachItem in selfPlayer.items:
             print(eachItem.__class__.__name__, end=", ")
@@ -397,7 +408,7 @@ def round(players):
 
         if inputKey == "G":
             extraTurn = holdGun(selfPlayer, frontPlayer, bullets)
-            turnFlag = turnFlag if extraTurn else not(turnFlag)
+            turnFlag = turnFlag if extraTurn else turnFlag -1
 
         elif inputKey == "X":
             exit(0)
@@ -405,7 +416,9 @@ def round(players):
         elif inputKey.isdigit():
             itemIdx = int(inputKey)
             if (itemIdx > 0) and (itemIdx < 9):
-                useItem(itemIdx, selfPlayer, frontPlayer, bullets)
+                result = useItem(itemIdx, selfPlayer, frontPlayer, bullets, turnFlag)
+                if result[0] == "turnFlag":
+                    turnFlag = result[1]
             else:
                 print(invalidInput)
 

@@ -82,6 +82,8 @@ class Item:
     def __init__(self):
         self.description = ""
     def __repr__(self):
+        return self.__class__.__name__
+    def __str__(self):
         return self.description
 
 class Magnifier(Item):

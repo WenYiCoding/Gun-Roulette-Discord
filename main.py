@@ -17,6 +17,8 @@
 import os
 import random
 import time
+import discord
+import config
 
 # Global variables
 TERMINAL_WIDTH = os.get_terminal_size()[0]

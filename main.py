@@ -13,13 +13,14 @@ client = Client(intents=intents) #:create discord user with these intents
 
 # Read message
 async def send_message(message, user_message):
-    if (not user_message and user_message[0] != ">"):
+    if (not user_message or user_message[0] != ">"):
         return
-    try:
-        command = user_message[1:]
-        print(command)
-    except Exception as err:
-        print(err)
+    else:
+        try:
+            command = user_message[1:]
+            print(command)
+        except Exception as err:
+            print(err)
 
 # Bot startup
 @client.event

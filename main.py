@@ -18,9 +18,9 @@ async def send_message(message, user_message):
     else:
         try:
             command = user_message[1:]
-            print(command)
+            
         except Exception as err:
-            print(err)
+            print(f'[!] ERR:{err}')
 
 # Bot startup
 @client.event
@@ -34,14 +34,16 @@ async def on_message(message):
         return
     
     username = str(message.author)
-    user_message = message.content
+    content = message.content
     channel = str(message.channel)
 
-    print(f"{channel}|{username}:{user_message}")
-    await send_message(Message, user_message)
+    print(f"{channel}\t{username}:{content}")
+    await send_message(Message, content)
 
+# Main function
 def main():
     client.run(token=TOKEN)
 
+# Execute
 if __name__ == "__main__":
     main()

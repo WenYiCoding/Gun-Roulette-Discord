@@ -1,10 +1,13 @@
 import os
 from dotenv import load_dotenv
-from discord import Intents, Client, Message
+from discord import Intents, Client, Message, errors
 
 # Load environment variables, get token
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
+if not TOKEN:
+    print("[!] Token not found, enter token manually")
+    TOKEN = input(">")
 
 # Set up bot
 intents = Intents.default() #:create variable that store permission-like config
@@ -18,7 +21,7 @@ async def send_message(message, user_message):
     else:
         try:
             command = user_message[1:]
-            
+
         except Exception as err:
             print(f'[!] ERR:{err}')
 

@@ -35,12 +35,13 @@ async def send_message(message, content):
                 if command == "start":
                     gameChannel = messageChannelTitle
                     await messageChannel.send("The game has started in this channel: "+gameChannel)
+                    await GunRouletteDiscord.program()
 
             elif messageChannelTitle != gameChannel:
                 await messageChannel.send("The game is ongoing in this channel: "+gameChannel)
                 return
             
-            GunRouletteDiscord.program()
+            await GunRouletteDiscord.waitInput(command)
 
         except Exception as err:
             print(f'[!] ERR:{err}')

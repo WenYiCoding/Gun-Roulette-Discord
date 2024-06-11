@@ -1,11 +1,6 @@
 # Library imports
-import os
 import random
 import time
-
-# Global variables
-TERMINAL_WIDTH = os.get_terminal_size()[0]
-CLI_HORIZONTAL_LINE = '='*TERMINAL_WIDTH
 
 # Message Strings
 askName = "Enter player's name\n[!] Enter empty name to become bot\n"
@@ -167,7 +162,7 @@ class Adrenaline(Item):
                     sendMessage(f"[{1+ idx}] {eachItem.__class__.__name__}")
                 sendMessage("[X] Give up stealing")
                 inputKey = waitInput(inputArrow)
-                clearCLI()
+                
                 if inputKey.isdigit():
                     inputKey = int(inputKey)
                     if (inputKey > 0 and inputKey <= len(frontPlayer.items)):
@@ -212,16 +207,12 @@ def createItem(idx):
     else:
         sendMessage(noSuchItem)
 
-#> Clear terminal output
-def clearCLI():
-    os.system('cls||clear')
-
 #> Initialize the player
 def initPlayer():
     players = []
     for i in range(1,3):
         players.append(Player(waitInput(f"[Player {i}] {askName}{inputArrow}")))
-        clearCLI()
+        
     return players
 
 #> Set rounds to play
@@ -230,7 +221,7 @@ def setRounds():
     while not(number.isdigit()):
         sendMessage(number, end="")
         number = waitInput(f"{askRounds}\n{inputArrow}")
-        clearCLI()
+        
         number = number if number.isdigit() else invalidInput
     return int(number)
 
@@ -254,7 +245,7 @@ def gunReload():
         time.sleep(1) #!3
 
     random.shuffle(bullets)
-    clearCLI() #!4
+     #!4
 
     return bullets
 
@@ -272,7 +263,7 @@ def holdGun(selfPlayer, frontPlayer, bullets):
     while inputKey != "X" and inputKey != "O":
         sendMessage(invalidInput if inputKey != "" else "")
         inputKey = waitInput(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
-        clearCLI()
+        
     if inputKey == "X":
         result = shootGun(frontPlayer.hp, bullets)
         frontPlayer.hp = result[0]
@@ -296,7 +287,7 @@ def shootGun(targetHP, bullets):
     elif bulletFired == 0:
         sendMessage(nothing)
     time.sleep(2) #!3
-    clearCLI()
+    
     return [targetHP, hitFlag]
 
 #> Item usage logic
@@ -308,7 +299,7 @@ def useItem(index, selfPlayer, frontPlayer, bullets, turnFlag):
         while True:
             sendMessage(selfPlayer.items[(index - 1)])
             inputKey = waitInput(f"[O]Use [X]Keep\n{inputArrow}")
-            clearCLI()
+            
             if inputKey == "O" or inputKey == "X":
                 break
             else:
@@ -319,7 +310,7 @@ def useItem(index, selfPlayer, frontPlayer, bullets, turnFlag):
             item = selfPlayer.items.pop((index - 1))
             result = item.use(selfPlayer, frontPlayer, bullets, turnFlag)
             time.sleep(2)
-            clearCLI()
+            
             return result
 
 #> Turn logic
@@ -371,13 +362,13 @@ def round(players):
         sendMessage()
 
         sendMessage("<- " if arrowFlag else "-> ", end="")
-        sendMessage(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = ", end="")
+        sendMessage(f"{selfPlayer.name}'s turn\nItems = ", end="")
         for eachItem in selfPlayer.items:
             sendMessage(eachItem.__class__.__name__, end=", ")
         sendMessage()
         
         inputKey = waitInput(f"{turnOptions}\n{inputArrow}")
-        clearCLI()
+        
 
         if inputKey == "G":
             extraTurn = holdGun(selfPlayer, frontPlayer, bullets)
@@ -401,11 +392,10 @@ def round(players):
 #> Whole program logic
 def program():
     while True:
-        clearCLI()
         players = initPlayer()
 
         for i in range(0,setRounds()):
-            sendMessage(f"Round {1+i}\n{CLI_HORIZONTAL_LINE}")
+            sendMessage(f"Round {1+i}\n")
 
             players = resetHealth(players)
             round(players)
@@ -417,7 +407,7 @@ def program():
         
         while True:
             inputKey = waitInput(f"{playAgain}\n{inputArrow}")
-            clearCLI()
+            
             if inputKey == "N":
                 exit(0)
             elif inputKey == "Y":
@@ -426,7 +416,12 @@ def program():
                 sendMessage(invalidInput)
 
 def waitInput(string):
+    sendMessage(string)
+    return string
+
+def throwInput(input):
     pass
 
-def sendMessage(string):
+def sendMessage(string, end="\n"):
+
     pass

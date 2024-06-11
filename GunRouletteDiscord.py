@@ -420,8 +420,7 @@ def waitInput(string):
     return string
 
 def throwInput(input):
-    pass
+    return input
 
 def sendMessage(string, end="\n"):
-
-    pass
+    return string + end

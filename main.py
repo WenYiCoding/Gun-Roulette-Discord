@@ -41,7 +41,8 @@ async def send_message(message, content):
                 await messageChannel.send("The game is ongoing in this channel: "+gameChannel)
                 return
             
-            await GunRouletteDiscord.waitInput(command)
+            await GunRouletteDiscord.throwInput(command)
+            await messageChannel.send(GunRouletteDiscord.sendMessage())
 
         except Exception as err:
             print(f'[!] ERR:{err}')

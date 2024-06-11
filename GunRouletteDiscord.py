@@ -76,7 +76,7 @@ class Magnifier(Item):
         super().__init__()
         self.description = magnifierDesc
     def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
-        print(f"{magnifierUsed}\n{bullets[0]}")
+        sendMessage(f"{magnifierUsed}\n{bullets[0]}")
 
 class MobilePhone(Item):
     def __init__(self):
@@ -85,7 +85,7 @@ class MobilePhone(Item):
     def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         whichBullet = random.randint(2,len(bullets))
         bulletLive = "LIVE" if bullets[(whichBullet -1)] == 1 else "BLANK"
-        print(f"{mobileUsed}\nThe bullet no. {whichBullet} is {bulletLive}")
+        sendMessage(f"{mobileUsed}\nThe bullet no. {whichBullet} is {bulletLive}")
 
 class Inverter(Item):
     def __init__(self):
@@ -93,7 +93,7 @@ class Inverter(Item):
         self.description = inverterDesc
     def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         bullets[0] = 1 if bullets[0] == 0 else 0
-        print(inverterUsed)
+        sendMessage(inverterUsed)
 
 class Saw(Item):
     def __init__(self):
@@ -101,21 +101,21 @@ class Saw(Item):
         self.description = sawDesc
     def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         bullets[0] = bullets[0] * 2
-        print(sawUsed)
+        sendMessage(sawUsed)
 
 class Beer(Item):
     def __init__(self):
         super().__init__()
         self.description = sodaDesc
     def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
-        print(f"{gunUsed}\n{bullets.pop(0)}")
+        sendMessage(f"{gunUsed}\n{bullets.pop(0)}")
 
 class BorrowGun(Item):
     def __init__(self):
         super().__init__()
         self.description = borrowGunDesc
     def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
-        print(borrowGunUsed)
+        sendMessage(borrowGunUsed)
         bullets.insert(0, random.randint(0,1))
 
 class Cigarette(Item):
@@ -125,10 +125,10 @@ class Cigarette(Item):
     def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         if selfPlayer.hp < 10:
             selfPlayer.hp = selfPlayer.hp + 1
-            print(cigaretteUsed)
+            sendMessage(cigaretteUsed)
         else:
             selfPlayer.items.append(Cigarette())
-            print(maxHealth)
+            sendMessage(maxHealth)
     
 class Pill(Item):
     def __init__(self):
@@ -138,10 +138,10 @@ class Pill(Item):
         if selfPlayer.hp < 10:
             hpGain = 3 if random.randint(0,1) == 1 else -2
             selfPlayer.hp = selfPlayer.hp + hpGain
-            print(pillUsed)
+            sendMessage(pillUsed)
         else:
             selfPlayer.items.append(Pill())
-            print(maxHealth)
+            sendMessage(maxHealth)
     
 #!!NOT COMPLETE
 class Handcuff(Item):
@@ -149,7 +149,7 @@ class Handcuff(Item):
         super().__init__()
         self.description = handcuffDesc
     def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
-        print(handcuffUsed)
+        sendMessage(handcuffUsed)
         return ["turnFlag", turnFlag +1]
 
 class Adrenaline(Item):
@@ -158,34 +158,34 @@ class Adrenaline(Item):
         self.description = adrenalineDesc
     def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         if len(frontPlayer.items) <= 0:
-            print(adrenalineNotUsed)
+            sendMessage(adrenalineNotUsed)
             selfPlayer.items.append(Adrenaline())
         else:
-            print(adrenalineUsed)
+            sendMessage(adrenalineUsed)
             while True:
                 for idx, eachItem in enumerate(frontPlayer.items):
-                    print(f"[{1+ idx}] {eachItem.__class__.__name__}")
-                print("[X] Give up stealing")
-                inputKey = input(inputArrow)
+                    sendMessage(f"[{1+ idx}] {eachItem.__class__.__name__}")
+                sendMessage("[X] Give up stealing")
+                inputKey = waitInput(inputArrow)
                 clearCLI()
                 if inputKey.isdigit():
                     inputKey = int(inputKey)
                     if (inputKey > 0 and inputKey <= len(frontPlayer.items)):
                         itemName = frontPlayer.items[inputKey -1].__class__.__name__
                         if itemName == "Adrenaline":
-                            print(cannotSteal)
+                            sendMessage(cannotSteal)
                         elif (itemName == "Cigarette" or itemName == "Pill") and selfPlayer.hp >= 10:
-                            print(maxHealth)
+                            sendMessage(maxHealth)
                         else:
                             frontPlayer.items.pop(inputKey -1).use(selfPlayer, frontPlayer, bullets)
                             return
                     else:
-                        print(invalidInput)
+                        sendMessage(invalidInput)
                 elif inputKey == "X":
-                    print(adrenalineGiveUp)
+                    sendMessage(adrenalineGiveUp)
                     return
                 else:
-                    print(invalidInput)
+                    sendMessage(invalidInput)
 
 #> Generate an item
 def createItem(idx):
@@ -210,7 +210,7 @@ def createItem(idx):
     elif idx == 9:
         return Adrenaline()
     else:
-        print(noSuchItem)
+        sendMessage(noSuchItem)
 
 #> Clear terminal output
 def clearCLI():
@@ -220,7 +220,7 @@ def clearCLI():
 def initPlayer():
     players = []
     for i in range(1,3):
-        players.append(Player(input(f"[Player {i}] {askName}{inputArrow}")))
+        players.append(Player(waitInput(f"[Player {i}] {askName}{inputArrow}")))
         clearCLI()
     return players
 
@@ -228,8 +228,8 @@ def initPlayer():
 def setRounds():
     number = ""
     while not(number.isdigit()):
-        print(number, end="")
-        number = input(f"{askRounds}\n{inputArrow}")
+        sendMessage(number, end="")
+        number = waitInput(f"{askRounds}\n{inputArrow}")
         clearCLI()
         number = number if number.isdigit() else invalidInput
     return int(number)
@@ -247,10 +247,10 @@ def gunReload():
             bullets.append(random.randint(0,1))
     random.shuffle(bullets)
 
-    print(f"Bullets:\n{bullets}")
+    sendMessage(f"Bullets:\n{bullets}")
 
     for i in range(5,-1,-1):
-        print(f"{insertBullets}({i})\r", end="")
+        sendMessage(f"{insertBullets}({i})\r", end="")
         time.sleep(1) #!3
 
     random.shuffle(bullets)
@@ -268,10 +268,10 @@ def resetHealth(players):
 def holdGun(selfPlayer, frontPlayer, bullets):
     inputKey = ""
 
-    print(gunHolding)
+    sendMessage(gunHolding)
     while inputKey != "X" and inputKey != "O":
-        print(invalidInput if inputKey != "" else "")
-        inputKey = input(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
+        sendMessage(invalidInput if inputKey != "" else "")
+        inputKey = waitInput(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
         clearCLI()
     if inputKey == "X":
         result = shootGun(frontPlayer.hp, bullets)
@@ -285,16 +285,16 @@ def holdGun(selfPlayer, frontPlayer, bullets):
 #> Shoot gun
 def shootGun(targetHP, bullets):
     hitFlag = False
-    print(gunFired)
+    sendMessage(gunFired)
     bulletFired = bullets.pop(0)
-    print(bulletFly)
+    sendMessage(bulletFly)
     time.sleep(2) #!3
     if (bulletFired == 1) or (bulletFired == 2):
         targetHP -= bulletFired
-        print(hit)
+        sendMessage(hit)
         hitFlag = True
     elif bulletFired == 0:
-        print(nothing)
+        sendMessage(nothing)
     time.sleep(2) #!3
     clearCLI()
     return [targetHP, hitFlag]
@@ -302,17 +302,17 @@ def shootGun(targetHP, bullets):
 #> Item usage logic
 def useItem(index, selfPlayer, frontPlayer, bullets, turnFlag):
     if index > (len(selfPlayer.items)):
-        print(noSuchItem)
+        sendMessage(noSuchItem)
     else:
         inputKey = ""
         while True:
-            print(selfPlayer.items[(index - 1)])
-            inputKey = input(f"[O]Use [X]Keep\n{inputArrow}")
+            sendMessage(selfPlayer.items[(index - 1)])
+            inputKey = waitInput(f"[O]Use [X]Keep\n{inputArrow}")
             clearCLI()
             if inputKey == "O" or inputKey == "X":
                 break
             else:
-                print(invalidInput)
+                sendMessage(invalidInput)
         if inputKey == "X":
             return
         elif inputKey == "O":
@@ -321,20 +321,6 @@ def useItem(index, selfPlayer, frontPlayer, bullets, turnFlag):
             time.sleep(2)
             clearCLI()
             return result
-
-#> Player target logic #!6
-""" def targetPlayer(players):
-    while True:
-        for idx, player in enumerate(players):
-            print(f"[{1 + idx}] {player.name} (HP = {player.hp})")
-        inputKey = input(inputArrow)
-        if inputKey.isdigit():
-            inputKey = int(inputKey)
-            if (inputKey > 0) and (inputKey <= len(players)):
-                inputKey = inputKey -1
-                return players[inputKey]
-        print(invalidInput)
- """
 
 #> Turn logic
 def round(players):
@@ -350,7 +336,7 @@ def round(players):
         #> Check player health, give win
         for idx, player in enumerate(players):
             if player.hp <= 0:
-                print(f"{player.name}{isDead}\n")
+                sendMessage(f"{player.name}{isDead}\n")
                 time.sleep(2) #!3
                 player.roundHistory.append(loseIcon)
 
@@ -370,7 +356,7 @@ def round(players):
                     player.items.append(createItem(random.randint(0,9)))
             bullets = gunReload()
         
-        print(f"{players[0].name}:{players[0].hp} | {players[1].name}:{players[1].hp}\n")
+        sendMessage(f"{players[0].name}:{players[0].hp} | {players[1].name}:{players[1].hp}\n")
 
         if turnFlag == 0:
             tempPlayer = selfPlayer
@@ -379,18 +365,18 @@ def round(players):
             turnFlag = turnFlag +1
             arrowFlag = not(arrowFlag)
 
-        print("Front player's items: ", end="")
+        sendMessage("Front player's items: ", end="")
         for eachItem in frontPlayer.items:
-            print(eachItem.__class__.__name__, end=", ")
-        print()
+            sendMessage(eachItem.__class__.__name__, end=", ")
+        sendMessage()
 
-        print("<- " if arrowFlag else "-> ", end="")
-        print(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = ", end="")
+        sendMessage("<- " if arrowFlag else "-> ", end="")
+        sendMessage(f"{selfPlayer.name}'s turn\n{CLI_HORIZONTAL_LINE}\nItems = ", end="")
         for eachItem in selfPlayer.items:
-            print(eachItem.__class__.__name__, end=", ")
-        print()
+            sendMessage(eachItem.__class__.__name__, end=", ")
+        sendMessage()
         
-        inputKey = input(f"{turnOptions}\n{inputArrow}")
+        inputKey = waitInput(f"{turnOptions}\n{inputArrow}")
         clearCLI()
 
         if inputKey == "G":
@@ -407,10 +393,10 @@ def round(players):
                 if result[0] == "turnFlag":
                     turnFlag = result[1]
             else:
-                print(invalidInput)
+                sendMessage(invalidInput)
 
         else:
-            print(invalidInput)
+            sendMessage(invalidInput)
 
 #> Whole program logic
 def program():
@@ -419,22 +405,28 @@ def program():
         players = initPlayer()
 
         for i in range(0,setRounds()):
-            print(f"Round {1+i}\n{CLI_HORIZONTAL_LINE}")
+            sendMessage(f"Round {1+i}\n{CLI_HORIZONTAL_LINE}")
 
             players = resetHealth(players)
             round(players)
 
-            print("Wins")
+            sendMessage("Wins")
             for player in players:
-                print(f"{player.name}: {player.roundHistory}")
-            print()
+                sendMessage(f"{player.name}: {player.roundHistory}")
+            sendMessage()
         
         while True:
-            inputKey = input(f"{playAgain}\n{inputArrow}")
+            inputKey = waitInput(f"{playAgain}\n{inputArrow}")
             clearCLI()
             if inputKey == "N":
                 exit(0)
             elif inputKey == "Y":
                 break
             else:
-                print(invalidInput)
+                sendMessage(invalidInput)
+
+def waitInput(string):
+    pass
+
+def sendMessage(string):
+    pass

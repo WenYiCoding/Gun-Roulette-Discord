@@ -1,18 +1,3 @@
-## Notes
-#!1 Later: Seperate some function to other py file for GUI
-#!2 User can type while time.sleep
-#!3 may need seperate Main Menu from Program()
-#!4 clear command not clean becoz \r
-#!5 starting bullets does not force at least one 0 and 1
-#!6 not in use
-#! contain some hardcode, need revamp
-#! bad state management, need revamp
-
-## Plans
-#? more player support
-#? item modding support
-#? rules configuration
-
 # Library imports
 import os
 import random

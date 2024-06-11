@@ -1,6 +1,10 @@
 import os
 from dotenv import load_dotenv
-from discord import Intents, Client, Message, errors
+from discord import Intents, Client, Message
+
+import GunRouletteDiscord
+
+gameChannel = ""
 
 # Load environment variables, get token
 load_dotenv()
@@ -14,13 +18,29 @@ intents = Intents.default() #:create variable that store permission-like config
 intents.message_content = True #:permit reading message content
 client = Client(intents=intents) #:create discord user with these intents
 
-# Read message
-async def send_message(message, user_message):
-    if (not user_message or user_message[0] != ">"):
+# Send message
+async def send_message(message, content):
+    if not content or content[0] != ">":
         return
     else:
         try:
-            command = user_message[1:]
+            global gameChannel
+            messageChannel = message.channel
+            messageChannelTitle = str(messageChannel)
+            
+            command = content[1:].lower()
+            print(f"[>] {command}")
+
+            if gameChannel == "":
+                if command == "start":
+                    gameChannel = messageChannelTitle
+                    await messageChannel.send("The game has started in this channel: "+gameChannel)
+
+            elif messageChannelTitle != gameChannel:
+                await messageChannel.send("The game is ongoing in this channel: "+gameChannel)
+                return
+            
+            print("Hit")
 
         except Exception as err:
             print(f'[!] ERR:{err}')
@@ -30,7 +50,7 @@ async def send_message(message, user_message):
 async def on_ready():
     print(f"[!] {client.user} is online")
 
-# Handle incoming messages
+# Read messages
 @client.event
 async def on_message(message):
     if message.author == client.user:
@@ -41,7 +61,7 @@ async def on_message(message):
     channel = str(message.channel)
 
     print(f"{channel}\t{username}:{content}")
-    await send_message(Message, content)
+    await send_message(message, content)
 
 # Main function
 def main():

@@ -19,13 +19,13 @@ intents.message_content = True #:permit reading message content
 client = Client(intents=intents) #:create discord user with these intents
 
 # Send message
-async def send_message(message, content):
+async def send_message(messageEvent, content):
     if not content or content[0] != ">":
         return
     else:
         try:
             global gameChannel
-            messageChannel = message.channel
+            messageChannel = messageEvent.channel
             messageChannelTitle = str(messageChannel)
             
             command = content[1:].lower()
@@ -34,15 +34,11 @@ async def send_message(message, content):
             if gameChannel == "":
                 if command == "start":
                     gameChannel = messageChannelTitle
-                    await messageChannel.send("The game has started in this channel: "+gameChannel)
-                    await GunRouletteDiscord.program()
+                    await messageChannel.send(f"The game has started on <#{gameChannel.id}>")
+                    await GunRouletteDiscord.program(messageEvent)
 
             elif messageChannelTitle != gameChannel:
-                await messageChannel.send("The game is ongoing in this channel: "+gameChannel)
-                return
-            
-            await GunRouletteDiscord.throwInput(command)
-            await messageChannel.send(GunRouletteDiscord.sendMessage())
+                await messageChannel.send(f"The game is ongoing on this channel: <#{gameChannel.id}>")
 
         except Exception as err:
             print(f'[!] ERR:{err}')

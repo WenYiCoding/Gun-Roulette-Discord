@@ -1,6 +1,6 @@
 # Library imports
 import random
-import time
+import asyncio
 
 # Message Strings
 askName = "Enter player's name\n[!] Enter empty name to become bot\n"
@@ -242,7 +242,7 @@ def gunReload():
 
     for i in range(5,-1,-1):
         sendMessage(f"{insertBullets}({i})\r", end="")
-        time.sleep(1) #!3
+        asyncio.sleep(1) #!3
 
     random.shuffle(bullets)
      #!4
@@ -279,14 +279,14 @@ def shootGun(targetHP, bullets):
     sendMessage(gunFired)
     bulletFired = bullets.pop(0)
     sendMessage(bulletFly)
-    time.sleep(2) #!3
+    asyncio.sleep(2) #!3
     if (bulletFired == 1) or (bulletFired == 2):
         targetHP -= bulletFired
         sendMessage(hit)
         hitFlag = True
     elif bulletFired == 0:
         sendMessage(nothing)
-    time.sleep(2) #!3
+    asyncio.sleep(2) #!3
     
     return [targetHP, hitFlag]
 
@@ -309,7 +309,7 @@ def useItem(index, selfPlayer, frontPlayer, bullets, turnFlag):
         elif inputKey == "O":
             item = selfPlayer.items.pop((index - 1))
             result = item.use(selfPlayer, frontPlayer, bullets, turnFlag)
-            time.sleep(2)
+            asyncio.sleep(2)
             
             return result
 
@@ -328,7 +328,7 @@ def round(players):
         for idx, player in enumerate(players):
             if player.hp <= 0:
                 sendMessage(f"{player.name}{isDead}\n")
-                time.sleep(2) #!3
+                asyncio.sleep(2) #!3
                 player.roundHistory.append(loseIcon)
 
                 idx = idx + 1
@@ -390,7 +390,7 @@ def round(players):
             sendMessage(invalidInput)
 
 #> Whole program logic
-def program():
+async def program():
     while True:
         players = initPlayer()
 
@@ -417,10 +417,15 @@ def program():
 
 def waitInput(string):
     sendMessage(string)
-    return string
+    return currentInput
 
+currentInput = ""
 def throwInput(input):
-    return input
+    global currentInput
+    currentInput = input
 
+output = ""
 def sendMessage(string, end="\n"):
-    return string + end
+    print(string, end=end)
+    global output
+    output = string + end

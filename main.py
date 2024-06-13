@@ -26,22 +26,24 @@ async def send_message(messageEvent, content):
         try:
             global gameChannel
             messageChannel = messageEvent.channel
-            messageChannelTitle = str(messageChannel)
             
             command = content[1:].lower()
             print(f"[>] {command}")
 
             if gameChannel == "":
                 if command == "start":
-                    gameChannel = messageChannelTitle
+                    gameChannel = messageChannel
                     await messageChannel.send(f"The game has started on <#{gameChannel.id}>")
-                    await GunRouletteDiscord.program(messageEvent)
+                    await GunRouletteDiscord.program(client, messageEvent)
+                    gameChannel = ""
 
-            elif messageChannelTitle != gameChannel:
-                await messageChannel.send(f"The game is ongoing on this channel: <#{gameChannel.id}>")
+            elif messageChannel != gameChannel:
+                await messageChannel.send(f"The game is ongoing in this channel: <#{gameChannel.id}>")
 
         except Exception as err:
             print(f'[!] ERR:{err}')
+            await messageChannel.send(f"[!] Critical ERROR met, game has closed")
+            gameChannel = ""
 
 # Bot startup
 @client.event

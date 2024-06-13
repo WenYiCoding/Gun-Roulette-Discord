@@ -70,97 +70,97 @@ class Magnifier(Item):
     def __init__(self):
         super().__init__()
         self.description = magnifierDesc
-    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
-        sendMessage(f"{magnifierUsed}\n{bullets[0]}")
+    async def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
+        await sendMessage(f"{magnifierUsed}\n{bullets[0]}")
 
 class MobilePhone(Item):
     def __init__(self):
         super().__init__()
         self.description = mobilePhoneDesc
-    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
+    async def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         whichBullet = random.randint(2,len(bullets))
         bulletLive = "LIVE" if bullets[(whichBullet -1)] == 1 else "BLANK"
-        sendMessage(f"{mobileUsed}\nThe bullet no. {whichBullet} is {bulletLive}")
+        await sendMessage(f"{mobileUsed}\nThe bullet no. {whichBullet} is {bulletLive}")
 
 class Inverter(Item):
     def __init__(self):
         super().__init__()
         self.description = inverterDesc
-    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
+    async def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         bullets[0] = 1 if bullets[0] == 0 else 0
-        sendMessage(inverterUsed)
+        await sendMessage(inverterUsed)
 
 class Saw(Item):
     def __init__(self):
         super().__init__()
         self.description = sawDesc
-    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
+    async def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         bullets[0] = bullets[0] * 2
-        sendMessage(sawUsed)
+        await sendMessage(sawUsed)
 
 class Beer(Item):
     def __init__(self):
         super().__init__()
         self.description = sodaDesc
-    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
-        sendMessage(f"{gunUsed}\n{bullets.pop(0)}")
+    async def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
+        await sendMessage(f"{gunUsed}\n{bullets.pop(0)}")
 
 class BorrowGun(Item):
     def __init__(self):
         super().__init__()
         self.description = borrowGunDesc
-    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
-        sendMessage(borrowGunUsed)
+    async def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
+        await sendMessage(borrowGunUsed)
         bullets.insert(0, random.randint(0,1))
 
 class Cigarette(Item):
     def __init__(self):
         super().__init__()
         self.description = cigaretteDesc
-    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
+    async def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         if selfPlayer.hp < 10:
             selfPlayer.hp = selfPlayer.hp + 1
-            sendMessage(cigaretteUsed)
+            await sendMessage(cigaretteUsed)
         else:
             selfPlayer.items.append(Cigarette())
-            sendMessage(maxHealth)
+            await sendMessage(maxHealth)
     
 class Pill(Item):
     def __init__(self):
         super().__init__()
         self.description = pillDesc
-    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
+    async def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         if selfPlayer.hp < 10:
             hpGain = 3 if random.randint(0,1) == 1 else -2
             selfPlayer.hp = selfPlayer.hp + hpGain
-            sendMessage(pillUsed)
+            await sendMessage(pillUsed)
         else:
             selfPlayer.items.append(Pill())
-            sendMessage(maxHealth)
+            await sendMessage(maxHealth)
     
 #!!NOT COMPLETE
 class Handcuff(Item):
     def __init__(self):
         super().__init__()
         self.description = handcuffDesc
-    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
-        sendMessage(handcuffUsed)
+    async def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
+        await sendMessage(handcuffUsed)
         return ["turnFlag", turnFlag +1]
 
 class Adrenaline(Item):
     def __init__(self):
         super().__init__()
         self.description = adrenalineDesc
-    def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
+    async def use(self, selfPlayer, frontPlayer, bullets, turnFlag):
         if len(frontPlayer.items) <= 0:
-            sendMessage(adrenalineNotUsed)
+            await sendMessage(adrenalineNotUsed)
             selfPlayer.items.append(Adrenaline())
         else:
-            sendMessage(adrenalineUsed)
+            await sendMessage(adrenalineUsed)
             while True:
                 for idx, eachItem in enumerate(frontPlayer.items):
-                    sendMessage(f"[{1+ idx}] {eachItem.__class__.__name__}")
-                sendMessage("[X] Give up stealing")
+                    await sendMessage(f"[{1+ idx}] {eachItem.__class__.__name__}")
+                await sendMessage("[X] Give up stealing")
                 inputKey = waitInput(inputArrow)
                 
                 if inputKey.isdigit():
@@ -168,22 +168,22 @@ class Adrenaline(Item):
                     if (inputKey > 0 and inputKey <= len(frontPlayer.items)):
                         itemName = frontPlayer.items[inputKey -1].__class__.__name__
                         if itemName == "Adrenaline":
-                            sendMessage(cannotSteal)
+                            await sendMessage(cannotSteal)
                         elif (itemName == "Cigarette" or itemName == "Pill") and selfPlayer.hp >= 10:
-                            sendMessage(maxHealth)
+                            await sendMessage(maxHealth)
                         else:
                             frontPlayer.items.pop(inputKey -1).use(selfPlayer, frontPlayer, bullets)
                             return
                     else:
-                        sendMessage(invalidInput)
+                        await sendMessage(invalidInput)
                 elif inputKey == "X":
-                    sendMessage(adrenalineGiveUp)
+                    await sendMessage(adrenalineGiveUp)
                     return
                 else:
-                    sendMessage(invalidInput)
+                    await sendMessage(invalidInput)
 
 #> Generate an item
-def createItem(idx):
+async def createItem(idx):
     if idx == 0:
         return Magnifier()
     elif idx == 1:
@@ -205,28 +205,28 @@ def createItem(idx):
     elif idx == 9:
         return Adrenaline()
     else:
-        sendMessage(noSuchItem)
+        await sendMessage(noSuchItem)
 
 #> Initialize the player
-def initPlayer():
+async def initPlayer():
     players = []
     for i in range(1,3):
-        players.append(Player(waitInput(f"[Player {i}] {askName}{inputArrow}")))
+        players.append(Player(await waitInput(f"[Player {i}] {askName}{inputArrow}")))
         
     return players
 
 #> Set rounds to play
-def setRounds():
+async def setRounds():
     number = ""
     while not(number.isdigit()):
-        sendMessage(number, end="")
+        await sendMessage(number, end="")
         number = waitInput(f"{askRounds}\n{inputArrow}")
         
         number = number if number.isdigit() else invalidInput
     return int(number)
 
 #> Reload gun
-def gunReload():
+async def gunReload():
     bullets = []
 
     for i in range(random.randint(2,8)):
@@ -238,10 +238,10 @@ def gunReload():
             bullets.append(random.randint(0,1))
     random.shuffle(bullets)
 
-    sendMessage(f"Bullets:\n{bullets}")
+    await sendMessage(f"Bullets:\n{bullets}")
 
     for i in range(5,-1,-1):
-        sendMessage(f"{insertBullets}({i})\r", end="")
+        await sendMessage(f"{insertBullets}({i})\r", end="")
         asyncio.sleep(1) #!3
 
     random.shuffle(bullets)
@@ -256,12 +256,12 @@ def resetHealth(players):
     return players
 
 #> Hold gun
-def holdGun(selfPlayer, frontPlayer, bullets):
+async def holdGun(selfPlayer, frontPlayer, bullets):
     inputKey = ""
 
-    sendMessage(gunHolding)
+    await sendMessage(gunHolding)
     while inputKey != "X" and inputKey != "O":
-        sendMessage(invalidInput if inputKey != "" else "")
+        await sendMessage(invalidInput if inputKey != "" else "")
         inputKey = waitInput(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
         
     if inputKey == "X":
@@ -274,36 +274,36 @@ def holdGun(selfPlayer, frontPlayer, bullets):
         return not(result[1])
 
 #> Shoot gun
-def shootGun(targetHP, bullets):
+async def shootGun(targetHP, bullets):
     hitFlag = False
-    sendMessage(gunFired)
+    await sendMessage(gunFired)
     bulletFired = bullets.pop(0)
-    sendMessage(bulletFly)
+    await sendMessage(bulletFly)
     asyncio.sleep(2) #!3
     if (bulletFired == 1) or (bulletFired == 2):
         targetHP -= bulletFired
-        sendMessage(hit)
+        await sendMessage(hit)
         hitFlag = True
     elif bulletFired == 0:
-        sendMessage(nothing)
+        await sendMessage(nothing)
     asyncio.sleep(2) #!3
     
     return [targetHP, hitFlag]
 
 #> Item usage logic
-def useItem(index, selfPlayer, frontPlayer, bullets, turnFlag):
+async def useItem(index, selfPlayer, frontPlayer, bullets, turnFlag):
     if index > (len(selfPlayer.items)):
-        sendMessage(noSuchItem)
+        await sendMessage(noSuchItem)
     else:
         inputKey = ""
         while True:
-            sendMessage(selfPlayer.items[(index - 1)])
+            await sendMessage(selfPlayer.items[(index - 1)])
             inputKey = waitInput(f"[O]Use [X]Keep\n{inputArrow}")
             
             if inputKey == "O" or inputKey == "X":
                 break
             else:
-                sendMessage(invalidInput)
+                await sendMessage(invalidInput)
         if inputKey == "X":
             return
         elif inputKey == "O":
@@ -314,7 +314,7 @@ def useItem(index, selfPlayer, frontPlayer, bullets, turnFlag):
             return result
 
 #> Turn logic
-def round(players):
+async def round(players):
     bullets = []
     turnFlag = 1
     arrowFlag = True
@@ -327,7 +327,7 @@ def round(players):
         #> Check player health, give win
         for idx, player in enumerate(players):
             if player.hp <= 0:
-                sendMessage(f"{player.name}{isDead}\n")
+                await sendMessage(f"{player.name}{isDead}\n")
                 asyncio.sleep(2) #!3
                 player.roundHistory.append(loseIcon)
 
@@ -347,7 +347,7 @@ def round(players):
                     player.items.append(createItem(random.randint(0,9)))
             bullets = gunReload()
         
-        sendMessage(f"{players[0].name}:{players[0].hp} | {players[1].name}:{players[1].hp}\n")
+        await sendMessage(f"{players[0].name}:{players[0].hp} | {players[1].name}:{players[1].hp}\n")
 
         if turnFlag == 0:
             tempPlayer = selfPlayer
@@ -356,16 +356,16 @@ def round(players):
             turnFlag = turnFlag +1
             arrowFlag = not(arrowFlag)
 
-        sendMessage("Front player's items: ", end="")
+        await sendMessage("Front player's items: ", end="")
         for eachItem in frontPlayer.items:
-            sendMessage(eachItem.__class__.__name__, end=", ")
-        sendMessage()
+            await sendMessage(eachItem.__class__.__name__, end=", ")
+        await sendMessage()
 
-        sendMessage("<- " if arrowFlag else "-> ", end="")
-        sendMessage(f"{selfPlayer.name}'s turn\nItems = ", end="")
+        await sendMessage("<- " if arrowFlag else "-> ", end="")
+        await sendMessage(f"{selfPlayer.name}'s turn\nItems = ", end="")
         for eachItem in selfPlayer.items:
-            sendMessage(eachItem.__class__.__name__, end=", ")
-        sendMessage()
+            await sendMessage(eachItem.__class__.__name__, end=", ")
+        await sendMessage()
         
         inputKey = waitInput(f"{turnOptions}\n{inputArrow}")
         
@@ -384,26 +384,32 @@ def round(players):
                 if result[0] == "turnFlag":
                     turnFlag = result[1]
             else:
-                sendMessage(invalidInput)
+                await sendMessage(invalidInput)
 
         else:
-            sendMessage(invalidInput)
+            await sendMessage(invalidInput)
 
+botClient = None
+messageEvent = None
 #> Whole program logic
-async def program():
+async def program(client, event):
+    global botClient, messageEvent
+    botClient = client
+    messageEvent = event
     while True:
-        players = initPlayer()
+
+        players = await initPlayer()
 
         for i in range(0,setRounds()):
-            sendMessage(f"Round {1+i}\n")
+            await sendMessage(f"Round {1+i}\n")
 
             players = resetHealth(players)
             round(players)
 
-            sendMessage("Wins")
+            await sendMessage("Wins")
             for player in players:
-                sendMessage(f"{player.name}: {player.roundHistory}")
-            sendMessage()
+                await sendMessage(f"{player.name}: {player.roundHistory}")
+            await sendMessage()
         
         while True:
             inputKey = waitInput(f"{playAgain}\n{inputArrow}")
@@ -413,19 +419,27 @@ async def program():
             elif inputKey == "Y":
                 break
             else:
-                sendMessage(invalidInput)
+                await sendMessage(invalidInput)
 
-def waitInput(string):
-    sendMessage(string)
+#> Similate standard input()
+async def waitInput(string):
+    await sendMessage(string)
+    currentInput = await waitUserInput()
     return currentInput
 
-currentInput = ""
-def throwInput(input):
-    global currentInput
-    currentInput = input
-
-output = ""
-def sendMessage(string, end="\n"):
+#> Send message base on bot event
+async def sendMessage(string, end="\n"):
     print(string, end=end)
-    global output
-    output = string + end
+    await messageEvent.channel.send(string + end)
+
+#> Wait input from discord
+async def waitUserInput():
+    def check(m):
+        return m.channel == messageEvent.channel and m.author != botClient.user and m.content[0] == ">"
+
+    try:
+        userInput = await botClient.wait_for('message', check=check, timeout=60.0)
+        return userInput.content[1:]
+    except asyncio.TimeoutError:
+        await sendMessage("Timed out waiting for input.")
+        return None

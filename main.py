@@ -35,6 +35,7 @@ async def send_message(messageEvent, content):
                     gameChannel = messageChannel
                     await messageChannel.send(f"The game has started on <#{gameChannel.id}>")
                     await GunRouletteDiscord.program(client, messageEvent)
+                    await messageChannel.send(f"The game has ended, you can start another game anywhere")
                     gameChannel = ""
 
             elif messageChannel != gameChannel:

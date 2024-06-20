@@ -398,7 +398,8 @@ async def program(client, event):
     global botClient, messageEvent
     botClient = client
     messageEvent = event
-    while True:
+    exitFlag = False
+    while not(exitFlag):
 
         players = await initPlayer()
 
@@ -411,13 +412,13 @@ async def program(client, event):
             await sendMessage("Wins")
             for player in players:
                 await sendMessage(f"{player.name}: {player.roundHistory}")
-            await sendMessage()
         
         while True:
-            inputKey = waitInput(f"{playAgain}\n{inputArrow}")
+            inputKey = await waitInput(f"{playAgain}\n{inputArrow}")
             
             if inputKey == "N":
-                exit(0)
+                exitFlag = True
+                break
             elif inputKey == "Y":
                 break
             else:

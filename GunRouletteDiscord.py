@@ -219,10 +219,12 @@ async def initPlayer():
 async def setRounds():
     number = ""
     while not(number.isdigit()):
-        await sendMessage(number, end="")
-        number = waitInput(f"{askRounds}\n{inputArrow}")
+        number = await waitInput(f"{askRounds}\n{inputArrow}")
         
-        number = number if number.isdigit() else invalidInput
+        if number.isdigit():
+            number = number
+        else:
+            await sendMessage(invalidInput)
     return int(number)
 
 #> Reload gun
@@ -400,7 +402,7 @@ async def program(client, event):
 
         players = await initPlayer()
 
-        for i in range(0,setRounds()):
+        for i in range(0, await setRounds()):
             await sendMessage(f"Round {1+i}\n")
 
             players = resetHealth(players)

@@ -361,17 +361,19 @@ async def game_round(players):
         await sendMessage("Front player's items: ", end="")
         for eachItem in frontPlayer.items:
             await sendMessage(eachItem.__class__.__name__, end=", ")
+        await sendMessage("")
 
         await sendMessage("<- " if arrowFlag else "-> ", end="")
         await sendMessage(f"{selfPlayer.name}'s turn\nItems = ", end="")
         for eachItem in selfPlayer.items:
             await sendMessage(eachItem.__class__.__name__, end=", ")
+        await sendMessage("")
         
-        inputKey = waitInput(f"{turnOptions}\n{inputArrow}")
+        inputKey = await waitInput(f"{turnOptions}\n{inputArrow}")
         
 
         if inputKey == "G":
-            extraTurn = holdGun(selfPlayer, frontPlayer, bullets)
+            extraTurn = await holdGun(selfPlayer, frontPlayer, bullets)
             turnFlag = turnFlag if extraTurn else turnFlag -1
 
         elif inputKey == "X":
@@ -429,9 +431,19 @@ async def waitInput(string):
     return currentInput
 
 #> Send message base on bot event
+accumMessage = ""
 async def sendMessage(string, end="\n"):
     print(string, end=end)
-    await messageEvent.channel.send(string + end)
+
+    global accumMessage
+
+    if end != "\n":
+        accumMessage = accumMessage + string + end
+    else:
+        if accumMessage == "":
+            accumMessage = string
+        await messageEvent.channel.send(accumMessage + end)
+        accumMessage = ""
 
 #> Wait input from discord
 async def waitUserInput():
@@ -439,7 +451,7 @@ async def waitUserInput():
         return m.channel == messageEvent.channel and m.author != botClient.user and m.content[0] == ">"
 
     try:
-        userInput = await botClient.wait_for('message', check=check, timeout=60.0)
+        userInput = await botClient.wait_for('message', check=check)
         return userInput.content[1:]
     except asyncio.TimeoutError:
         await sendMessage("Timed out waiting for input.")

@@ -316,7 +316,7 @@ async def useItem(index, selfPlayer, frontPlayer, bullets, turnFlag):
             return result
 
 #> Turn logic
-async def round(players):
+async def game_round(players):
     bullets = []
     turnFlag = 1
     arrowFlag = True
@@ -361,13 +361,11 @@ async def round(players):
         await sendMessage("Front player's items: ", end="")
         for eachItem in frontPlayer.items:
             await sendMessage(eachItem.__class__.__name__, end=", ")
-        await sendMessage()
 
         await sendMessage("<- " if arrowFlag else "-> ", end="")
         await sendMessage(f"{selfPlayer.name}'s turn\nItems = ", end="")
         for eachItem in selfPlayer.items:
             await sendMessage(eachItem.__class__.__name__, end=", ")
-        await sendMessage()
         
         inputKey = waitInput(f"{turnOptions}\n{inputArrow}")
         
@@ -407,7 +405,7 @@ async def program(client, event):
             await sendMessage(f"Round {1+i}\n")
 
             players = resetHealth(players)
-            round(players)
+            await game_round(players)
 
             await sendMessage("Wins")
             for player in players:
@@ -446,3 +444,7 @@ async def waitUserInput():
     except asyncio.TimeoutError:
         await sendMessage("Timed out waiting for input.")
         return None
+
+# Execute
+if __name__ == "__main__":
+    raise PermissionError("Only can be executed as module")

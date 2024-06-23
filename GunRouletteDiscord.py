@@ -321,11 +321,12 @@ async def game_round(players):
     turnFlag = 1
     arrowFlag = True
     firstCycleFlag = True
+    endGameFlag = False
 
     selfPlayer = players[0]
     frontPlayer = players[1]
 
-    while True:
+    while not(endGameFlag):
         #> Check player health, give win
         for idx, player in enumerate(players):
             if player.hp <= 0:
@@ -377,7 +378,7 @@ async def game_round(players):
             turnFlag = turnFlag if extraTurn else turnFlag -1
 
         elif inputKey == "X":
-            exit(0)
+            endGameFlag = True
 
         elif inputKey.isdigit():
             itemIdx = int(inputKey)
@@ -390,6 +391,11 @@ async def game_round(players):
 
         else:
             await sendMessage(invalidInput)
+    
+    if endGameFlag:
+        return 1
+    else:
+        return 0
 
 botClient = None
 messageEvent = None
@@ -407,7 +413,8 @@ async def program(client, event):
             await sendMessage(f"Round {1+i}\n")
 
             players = resetHealth(players)
-            await game_round(players)
+            if await game_round(players) == 1:
+                break
 
             await sendMessage("Wins")
             for player in players:

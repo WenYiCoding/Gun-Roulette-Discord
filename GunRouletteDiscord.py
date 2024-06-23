@@ -240,14 +240,11 @@ async def gunReload():
             bullets.append(random.randint(0,1))
     random.shuffle(bullets)
 
-    await sendMessage(f"Bullets:\n{bullets}")
-
-    for i in range(5,-1,-1):
-        await sendMessage(f"{insertBullets}({i})\r", end="")
-        asyncio.sleep(1) #!3
+    await sendMessage(f"Bullets:\n{bullets}\n{insertBullets}")
+    await asyncio.sleep(5)
+    await deleteMessage()
 
     random.shuffle(bullets)
-     #!4
 
     return bullets
 
@@ -263,15 +260,16 @@ async def holdGun(selfPlayer, frontPlayer, bullets):
 
     await sendMessage(gunHolding)
     while inputKey != "X" and inputKey != "O":
-        await sendMessage(invalidInput if inputKey != "" else "")
-        inputKey = waitInput(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
+        if inputKey != "":
+            await sendMessage(invalidInput)
+        inputKey = await waitInput(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
         
     if inputKey == "X":
-        result = shootGun(frontPlayer.hp, bullets)
+        result = await shootGun(frontPlayer.hp, bullets)
         frontPlayer.hp = result[0]
         return result[1]
     elif inputKey == "O":
-        result = shootGun(selfPlayer.hp, bullets)
+        result = await shootGun(selfPlayer.hp, bullets)
         selfPlayer.hp = result[0]
         return not(result[1])
 
@@ -316,16 +314,17 @@ async def useItem(index, selfPlayer, frontPlayer, bullets, turnFlag):
             return result
 
 #> Turn logic
-async def round(players):
+async def game_round(players):
     bullets = []
     turnFlag = 1
     arrowFlag = True
     firstCycleFlag = True
+    endGameFlag = False
 
     selfPlayer = players[0]
     frontPlayer = players[1]
 
-    while True:
+    while not(endGameFlag):
         #> Check player health, give win
         for idx, player in enumerate(players):
             if player.hp <= 0:
@@ -347,7 +346,7 @@ async def round(players):
             else:
                 for player in players:
                     player.items.append(createItem(random.randint(0,9)))
-            bullets = gunReload()
+            bullets = await gunReload()
         
         await sendMessage(f"{players[0].name}:{players[0].hp} | {players[1].name}:{players[1].hp}\n")
 
@@ -361,23 +360,23 @@ async def round(players):
         await sendMessage("Front player's items: ", end="")
         for eachItem in frontPlayer.items:
             await sendMessage(eachItem.__class__.__name__, end=", ")
-        await sendMessage()
+        await sendMessage("")
 
         await sendMessage("<- " if arrowFlag else "-> ", end="")
         await sendMessage(f"{selfPlayer.name}'s turn\nItems = ", end="")
         for eachItem in selfPlayer.items:
             await sendMessage(eachItem.__class__.__name__, end=", ")
-        await sendMessage()
+        await sendMessage("")
         
-        inputKey = waitInput(f"{turnOptions}\n{inputArrow}")
+        inputKey = await waitInput(f"{turnOptions}\n{inputArrow}")
         
 
         if inputKey == "G":
-            extraTurn = holdGun(selfPlayer, frontPlayer, bullets)
+            extraTurn = await holdGun(selfPlayer, frontPlayer, bullets)
             turnFlag = turnFlag if extraTurn else turnFlag -1
 
         elif inputKey == "X":
-            exit(0)
+            endGameFlag = True
 
         elif inputKey.isdigit():
             itemIdx = int(inputKey)
@@ -390,6 +389,11 @@ async def round(players):
 
         else:
             await sendMessage(invalidInput)
+    
+    if endGameFlag:
+        return 1
+    else:
+        return 0
 
 botClient = None
 messageEvent = None
@@ -407,7 +411,8 @@ async def program(client, event):
             await sendMessage(f"Round {1+i}\n")
 
             players = resetHealth(players)
-            round(players)
+            if await game_round(players) == 1:
+                break
 
             await sendMessage("Wins")
             for player in players:
@@ -431,9 +436,23 @@ async def waitInput(string):
     return currentInput
 
 #> Send message base on bot event
+accumMessage = ""
 async def sendMessage(string, end="\n"):
     print(string, end=end)
-    await messageEvent.channel.send(string + end)
+
+    global accumMessage
+
+    if end != "\n":
+        accumMessage = accumMessage + string + end
+    else:
+        if accumMessage == "":
+            accumMessage = string
+        await messageEvent.channel.send(accumMessage + end)
+        accumMessage = ""
+
+#> Delete message base on message event
+async def deleteMessage():
+    await messageEvent.delete()
 
 #> Wait input from discord
 async def waitUserInput():
@@ -441,8 +460,12 @@ async def waitUserInput():
         return m.channel == messageEvent.channel and m.author != botClient.user and m.content[0] == ">"
 
     try:
-        userInput = await botClient.wait_for('message', check=check, timeout=60.0)
+        userInput = await botClient.wait_for('message', check=check)
         return userInput.content[1:]
     except asyncio.TimeoutError:
         await sendMessage("Timed out waiting for input.")
         return None
+
+# Execute
+if __name__ == "__main__":
+    raise PermissionError("Only can be executed as module")

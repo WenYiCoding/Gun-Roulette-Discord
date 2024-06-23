@@ -240,14 +240,11 @@ async def gunReload():
             bullets.append(random.randint(0,1))
     random.shuffle(bullets)
 
-    await sendMessage(f"Bullets:\n{bullets}")
-
-    for i in range(5,-1,-1):
-        await sendMessage(f"{insertBullets}({i})\r", end="")
-        asyncio.sleep(1) #!3
+    await sendMessage(f"Bullets:\n{bullets}\n{insertBullets}")
+    await asyncio.sleep(5)
+    await deleteMessage()
 
     random.shuffle(bullets)
-     #!4
 
     return bullets
 
@@ -452,6 +449,10 @@ async def sendMessage(string, end="\n"):
             accumMessage = string
         await messageEvent.channel.send(accumMessage + end)
         accumMessage = ""
+
+#> Delete message base on message event
+async def deleteMessage():
+    await messageEvent.delete()
 
 #> Wait input from discord
 async def waitUserInput():

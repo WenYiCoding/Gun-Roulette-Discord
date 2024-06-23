@@ -263,15 +263,16 @@ async def holdGun(selfPlayer, frontPlayer, bullets):
 
     await sendMessage(gunHolding)
     while inputKey != "X" and inputKey != "O":
-        await sendMessage(invalidInput if inputKey != "" else "")
-        inputKey = waitInput(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
+        if inputKey != "":
+            await sendMessage(invalidInput)
+        inputKey = await waitInput(f"[X]Shoot front: {frontPlayer.name} [O]Shoot self: {selfPlayer.name}\n{inputArrow}")
         
     if inputKey == "X":
-        result = shootGun(frontPlayer.hp, bullets)
+        result = await shootGun(frontPlayer.hp, bullets)
         frontPlayer.hp = result[0]
         return result[1]
     elif inputKey == "O":
-        result = shootGun(selfPlayer.hp, bullets)
+        result = await shootGun(selfPlayer.hp, bullets)
         selfPlayer.hp = result[0]
         return not(result[1])
 
@@ -348,7 +349,7 @@ async def game_round(players):
             else:
                 for player in players:
                     player.items.append(createItem(random.randint(0,9)))
-            bullets = gunReload()
+            bullets = await gunReload()
         
         await sendMessage(f"{players[0].name}:{players[0].hp} | {players[1].name}:{players[1].hp}\n")
 

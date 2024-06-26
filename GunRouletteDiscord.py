@@ -242,7 +242,6 @@ async def gunReload():
 
     await sendMessage(f"Bullets:\n{bullets}\n{insertBullets}")
     await asyncio.sleep(5)
-    await deleteMessage()
 
     random.shuffle(bullets)
 
@@ -345,7 +344,7 @@ async def game_round(players):
                 firstCycleFlag = not(firstCycleFlag)
             else:
                 for player in players:
-                    player.items.append(createItem(random.randint(0,9)))
+                    player.items.append(await createItem(random.randint(0,9)))
             bullets = await gunReload()
         
         await sendMessage(f"{players[0].name}:{players[0].hp} | {players[1].name}:{players[1].hp}\n")

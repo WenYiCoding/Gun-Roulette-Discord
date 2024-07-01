@@ -161,7 +161,7 @@ class Adrenaline(Item):
                 for idx, eachItem in enumerate(frontPlayer.items):
                     await sendMessage(f"[{1+ idx}] {eachItem.__class__.__name__}")
                 await sendMessage("[X] Give up stealing")
-                inputKey = waitInput(inputArrow)
+                inputKey = await waitInput(inputArrow)
                 
                 if inputKey.isdigit():
                     inputKey = int(inputKey)
@@ -296,15 +296,15 @@ async def useItem(index, selfPlayer, frontPlayer, bullets, turnFlag):
     else:
         inputKey = ""
         while True:
-            await sendMessage(selfPlayer.items[(index - 1)])
-            inputKey = waitInput(f"[O]Use [X]Keep\n{inputArrow}")
+            await sendMessage(str(selfPlayer.items[(index - 1)]))
+            inputKey = await waitInput(f"[O]Use [X]Keep\n{inputArrow}")
             
             if inputKey == "O" or inputKey == "X":
                 break
             else:
                 await sendMessage(invalidInput)
         if inputKey == "X":
-            return
+            return [""]
         elif inputKey == "O":
             item = selfPlayer.items.pop((index - 1))
             result = item.use(selfPlayer, frontPlayer, bullets, turnFlag)
@@ -347,6 +347,17 @@ async def game_round(players):
                     player.items.append(await createItem(random.randint(0,9)))
             bullets = await gunReload()
         
+        players[0].items.append(await createItem(0))
+        #
+        #
+        #
+        #
+        #
+        #
+        #
+        #
+        #
+
         await sendMessage(f"{players[0].name}:{players[0].hp} | {players[1].name}:{players[1].hp}\n")
 
         if turnFlag == 0:
@@ -380,7 +391,7 @@ async def game_round(players):
         elif inputKey.isdigit():
             itemIdx = int(inputKey)
             if (itemIdx > 0) and (itemIdx < 9):
-                result = useItem(itemIdx, selfPlayer, frontPlayer, bullets, turnFlag)
+                result = await useItem(itemIdx, selfPlayer, frontPlayer, bullets, turnFlag)
                 if result[0] == "turnFlag":
                     turnFlag = result[1]
             else:

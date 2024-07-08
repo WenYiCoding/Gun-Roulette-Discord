@@ -278,14 +278,14 @@ async def shootGun(targetHP, bullets):
     await sendMessage(gunFired)
     bulletFired = bullets.pop(0)
     await sendMessage(bulletFly)
-    asyncio.sleep(2) #!3
+    await asyncio.sleep(2) #!3
     if (bulletFired == 1) or (bulletFired == 2):
         targetHP -= bulletFired
         await sendMessage(hit)
         hitFlag = True
     elif bulletFired == 0:
         await sendMessage(nothing)
-    asyncio.sleep(2) #!3
+    await asyncio.sleep(2) #!3
     
     return [targetHP, hitFlag]
 
@@ -307,8 +307,8 @@ async def useItem(index, selfPlayer, frontPlayer, bullets, turnFlag):
             return [""]
         elif inputKey == "O":
             item = selfPlayer.items.pop((index - 1))
-            result = item.use(selfPlayer, frontPlayer, bullets, turnFlag)
-            asyncio.sleep(2)
+            result = await item.use(selfPlayer, frontPlayer, bullets, turnFlag)
+            await asyncio.sleep(2)
             
             return result
 
@@ -328,7 +328,7 @@ async def game_round(players):
         for idx, player in enumerate(players):
             if player.hp <= 0:
                 await sendMessage(f"{player.name}{isDead}\n")
-                asyncio.sleep(2) #!3
+                await asyncio.sleep(2) #!3
                 player.roundHistory.append(loseIcon)
 
                 idx = idx + 1
@@ -347,15 +347,17 @@ async def game_round(players):
                     player.items.append(await createItem(random.randint(0,9)))
             bullets = await gunReload()
         
-        players[0].items.append(await createItem(0))
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        #
+        await sendMessage(str(bullets))
+        players[0].items.append(await createItem(8))
+        players[1].items.append(await createItem(4))
+        #Magnifier
+        #MobilePhone
+        #Inverter
+        #Saw
+        #Beer
+        #BorrowGun
+        #Cigarette
+        #Pill
         #
 
         await sendMessage(f"{players[0].name}:{players[0].hp} | {players[1].name}:{players[1].hp}\n")
@@ -392,8 +394,9 @@ async def game_round(players):
             itemIdx = int(inputKey)
             if (itemIdx > 0) and (itemIdx < 9):
                 result = await useItem(itemIdx, selfPlayer, frontPlayer, bullets, turnFlag)
-                if result[0] == "turnFlag":
-                    turnFlag = result[1]
+                if result == False:
+                    if result[0] == "turnFlag":
+                        turnFlag = result[1]
             else:
                 await sendMessage(invalidInput)
 
